@@ -1,5 +1,9 @@
 package model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import util.Triangle;
 import util.Vector3D;
 
 public class BasicPlane extends AbstractPlane{
@@ -17,7 +21,6 @@ public class BasicPlane extends AbstractPlane{
 		plane.upperRightCorner = Vector3D.of(plane.startBase.x - backUpperCornerShift, 
 											 plane.startBase.y + bodyHeight, 
 											 plane.startBase.z + bodyAngle);
-		
 		plane.upperMiddleRight = Vector3D.mul(Vector3D.add(plane.endBase, plane.upperRightCorner), 0.5f);
 		
 		
@@ -29,6 +32,16 @@ public class BasicPlane extends AbstractPlane{
 
 		return plane;
 	}
+	@Override
+	public List<Triangle>getTriangles(){
+		List<Triangle>tris = new ArrayList<Triangle>();
+		
+		tris.add(Triangle.of(startBase, endBase, upperRightCorner));
+		tris.add(Triangle.of(startBase, endBase, upperLeftCorner));
+		
+		return tris;
+	}
+	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
@@ -47,4 +60,5 @@ public class BasicPlane extends AbstractPlane{
 		BasicPlane plane = BasicPlane.construct(50f, 10f, 10f, 15f);
 		System.out.println(plane);
 	}
+	
 }
