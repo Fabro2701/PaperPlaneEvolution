@@ -269,13 +269,19 @@ public class PlaneViewer extends JPanel{
 	public static void main(String args[]) {
 		BasicPlane plane = BasicPlane.construct(40f, 5f, 2.5f, 10f);
 		System.out.println(plane);
-		plane.addShape(new BasicPlaneShape(plane.upperRightCorner,
+		/*plane.addShape(new BasicPlaneShape(plane.upperRightCorner,
 										   plane.endBase,
 										   Vector3D.add(plane.upperRightCorner, Vector3D.of(0f, 0f, 5f))
 										   ));
 		plane.addShape(new BasicPlaneShape(plane.upperLeftCorner,
 				   						   plane.endBase,
 				   						   Vector3D.add(plane.upperLeftCorner, Vector3D.of(0f, 0f, -5f))
+				   ));
+				   */
+		plane.addShape(new BasicPlaneShape(plane.upperRightCorner,
+				Vector3D.add(plane.upperRightCorner, Vector3D.of(0f, 0f, 5f)),
+				   Vector3D.add(plane.endBase, Vector3D.of(0f, 0f, 5f)),
+				   plane.endBase
 				   ));
 		SwingUtilities.invokeLater(()->{
 			JFrame frame = new JFrame();
