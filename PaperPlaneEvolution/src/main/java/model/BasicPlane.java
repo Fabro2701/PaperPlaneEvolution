@@ -7,10 +7,11 @@ import util.Triangle;
 import util.Vector3D;
 
 public class BasicPlane extends AbstractPlane{
-	Vector3D startBase, middleBase, endBase;
-	Vector3D upperRightCorner, upperMiddleRight;
-	Vector3D upperLeftCorner, upperMiddleLeft;
+	public Vector3D startBase, middleBase, endBase;
+	public Vector3D upperRightCorner, upperMiddleRight;
+	public Vector3D upperLeftCorner, upperMiddleLeft;
 	
+	List<Triangle>tris;
 	public static BasicPlane construct(float baseLength, float backUpperCornerShift, float bodyAngle ,float bodyHeight) {
 		BasicPlane plane = new BasicPlane();
 		
@@ -23,22 +24,21 @@ public class BasicPlane extends AbstractPlane{
 											 plane.startBase.z + bodyAngle);
 		plane.upperMiddleRight = Vector3D.mul(Vector3D.add(plane.endBase, plane.upperRightCorner), 0.5f);
 		
-		
-		
 		plane.upperLeftCorner = Vector3D.of(plane.startBase.x - backUpperCornerShift, 
 											plane.startBase.y + bodyHeight, 
 											plane.startBase.z - bodyAngle);
 		plane.upperMiddleLeft = Vector3D.mul(Vector3D.add(plane.endBase, plane.upperLeftCorner), 0.5f);
-
+		
+		plane.tris = new ArrayList<Triangle>();
+		plane.tris.add(Triangle.of(plane.startBase, plane.endBase, plane.upperRightCorner));
+		plane.tris.add(Triangle.of(plane.startBase, plane.endBase, plane.upperLeftCorner));
 		return plane;
+	}
+	public void addShape(PlaneShape shape) {
+		tris.addAll(shape.getTriangles());
 	}
 	@Override
 	public List<Triangle>getTriangles(){
-		List<Triangle>tris = new ArrayList<Triangle>();
-		
-		tris.add(Triangle.of(startBase, endBase, upperRightCorner));
-		tris.add(Triangle.of(startBase, endBase, upperLeftCorner));
-		
 		return tris;
 	}
 	

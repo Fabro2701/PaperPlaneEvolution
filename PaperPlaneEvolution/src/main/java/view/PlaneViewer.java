@@ -20,6 +20,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 import model.BasicPlane;
+import model.BasicPlaneShape;
 import util.Matrix;
 import util.Triangle;
 import util.Vector3D;
@@ -151,7 +152,7 @@ public class PlaneViewer extends JPanel{
 		super.paintComponent(g);
 		
 		Graphics2D g2 = (Graphics2D)g;
-		g2.setColor(Color.black);
+		g2.setColor(Color.white);
 		
 		g2.fillRect(0, 0, this.getWidth(), this.getHeight());
 		
@@ -248,7 +249,7 @@ public class PlaneViewer extends JPanel{
 					
 
 					System.out.println("printingf: "+tri.toString());
-					g2.setColor(Color.white);
+					g2.setColor(Color.black);
 					g2.fillPolygon(new int[] {(int) triProjected.points[0].x,(int)triProjected.points[1].x,(int)triProjected.points[2].x}, new int[] {(int)triProjected.points[0].y,(int)triProjected.points[1].y,(int)triProjected.points[2].y}, 3);
 					
 					g2.setColor(Color.green);
@@ -266,7 +267,16 @@ public class PlaneViewer extends JPanel{
 //		}
 	}
 	public static void main(String args[]) {
-		BasicPlane plane = BasicPlane.construct(40f, 5f, 5f, 10f);
+		BasicPlane plane = BasicPlane.construct(40f, 5f, 2.5f, 10f);
+		System.out.println(plane);
+		plane.addShape(new BasicPlaneShape(plane.upperRightCorner,
+										   plane.endBase,
+										   Vector3D.add(plane.upperRightCorner, Vector3D.of(0f, 0f, 5f))
+										   ));
+		plane.addShape(new BasicPlaneShape(plane.upperLeftCorner,
+				   						   plane.endBase,
+				   						   Vector3D.add(plane.upperLeftCorner, Vector3D.of(0f, 0f, -5f))
+				   ));
 		SwingUtilities.invokeLater(()->{
 			JFrame frame = new JFrame();
 			Dimension size = new Dimension(600, 600);
