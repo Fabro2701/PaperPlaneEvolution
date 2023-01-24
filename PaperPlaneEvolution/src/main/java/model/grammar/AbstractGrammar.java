@@ -1,18 +1,13 @@
 package model.grammar;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import model.grammar.Chromosome.Codon;
 
-import simulator.model.entity.individuals.Chromosome;
-import simulator.model.entity.individuals.Chromosome.Codon;
-import simulator.model.entity.individuals.Mapper;
+
 
 
 public abstract class AbstractGrammar implements Mapper{

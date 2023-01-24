@@ -1,6 +1,8 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
@@ -47,41 +49,46 @@ public class BasicPlane extends AbstractPlane{
 		return plane;
 	}
 	
-	private double max(Function<Vector3D, Double>f) {
+	private Vector3D max(Function<Vector3D, Double>f) {
 		Triangle t = this.tris.stream().max((Triangle t1, Triangle t2)->{double m1=Math.max(f.apply(t1.points[0]), Math.max(f.apply(t1.points[1]), f.apply(t1.points[2])));
 																		 double m2=Math.max(f.apply(t2.points[0]), Math.max(f.apply(t2.points[1]), f.apply(t2.points[2])));
 																		 return Double.compare(m1,m2);}
 											).get();
-		return Math.max(f.apply(t.points[0]), Math.max(f.apply(t.points[1]), f.apply(t.points[2])));
+		return Arrays.stream(t.points).max((Vector3D v1, Vector3D v2)->{return Double.compare(f.apply(v1), f.apply(v2));}).get();
 	}
-	private double min(Function<Vector3D, Double>f) {
+	private Vector3D min(Function<Vector3D, Double>f) {
 		Triangle t = this.tris.stream().min((Triangle t1, Triangle t2)->{double m1=Math.min(f.apply(t1.points[0]), Math.min(f.apply(t1.points[1]), f.apply(t1.points[2])));
 																		 double m2=Math.min(f.apply(t2.points[0]), Math.min(f.apply(t2.points[1]), f.apply(t2.points[2])));
 																		 return Double.compare(m1,m2);}
 											).get();
-		return Math.min(f.apply(t.points[0]), Math.min(f.apply(t.points[1]), f.apply(t.points[2])));
+		return Arrays.stream(t.points).min((Vector3D v1, Vector3D v2)->{return Double.compare(f.apply(v1), f.apply(v2));}).get();
 	}
-	public double maxX() {
+	public Vector3D maxX() {
 		return max((Vector3D v)->v.x);
 	}
-	public double maxY() {
+	public Vector3D maxY() {
 		return max((Vector3D v)->v.y);
 	}
-	public double maxZ() {
+	public Vector3D maxZ() {
 		return max((Vector3D v)->v.z);
 	}
-	public double minX() {
+	public Vector3D minX() {
 		return min((Vector3D v)->v.x);
 	}
-	public double minY() {
+	public Vector3D minY() {
 		return min((Vector3D v)->v.y);
 	}
-	public double minZ() {
+	public Vector3D minZ() {
 		return min((Vector3D v)->v.z);
 	}
 	public void addShape(PlaneShape shape) {
 		shapes.add(shape);
 		tris.addAll(shape.getTriangles());
+	}
+	public void addShapes(Collection<BasicPlaneShape> shapes) {
+		for(PlaneShape shape:shapes) {
+			this.addShape(shape);
+		}
 	}
 	@Override
 	public List<Triangle>getTriangles(){
@@ -105,7 +112,7 @@ public class BasicPlane extends AbstractPlane{
 	public static void main(String args[]) {
 		BasicPlane plane = BasicPlane.construct(50d, 10d, 10d, 15d);
 		System.out.println(plane);
-		System.out.println(plane.maxX());
+		System.out.println(plane.minX());
 	}
 	
 }

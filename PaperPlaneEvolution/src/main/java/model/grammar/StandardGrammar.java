@@ -5,18 +5,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import grammar.AbstractGrammar.Production;
-import grammar.AbstractGrammar.Symbol;
-import grammar.bnf.BNFParser;
-import simulator.model.entity.individuals.Chromosome;
-import simulator.model.entity.individuals.Phenotype;
+import model.grammar.bnf.BNFParser;
 
 /**
  * 
@@ -148,24 +143,6 @@ public class StandardGrammar extends AbstractGrammar{
 		StandardGrammar g = new StandardGrammar();
 		g.parseBNF("default");
 		System.out.println(g);
-		
-		
-		//Grammar g = new Grammar("s");
-		//System.out.println(g);
-		for(int i=0;i<1;i++) {
-			Chromosome c = new Chromosome(50);
-			c.setArrayIntToCodon(0, 1,1,1,2,1,3,1,0,0,4, 1,1,0,0,0,0,3 );
-			
-			
-			LinkedList<Symbol> l = g.mapChromosome(c);
-			l.forEach(e->System.out.print(e+" "));
-			Phenotype pt = new Phenotype();
-			System.out.println("\nvisual: ");
-			System.out.println(pt.getVisualCode());
-			System.out.println("-----------------");
-		}
-		
-		
-		
+
 	}
 }

@@ -13,6 +13,7 @@ import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.swing.JFrame;
@@ -22,6 +23,9 @@ import javax.swing.SwingUtilities;
 import model.BasicPlane;
 import model.BasicPlaneShape;
 import model.engine.Engine;
+import model.grammar.AbstractGrammar.Symbol;
+import model.grammar.Chromosome;
+import model.grammar.StandardGrammar;
 import util.Matrix;
 import util.Triangle;
 import util.Vector3D;
@@ -278,8 +282,24 @@ public class PlaneViewer extends JPanel{
 		}
 	}
 	public static void main(String args[]) {
+		Chromosome<Chromosome.Codon> c = new Chromosome<>(50, Chromosome.Codon::new);
+		StandardGrammar grammar = new StandardGrammar();
+		grammar.parseBNF("resources/grammar/default.bnf");
+		LinkedList<Symbol>ss = (LinkedList<Symbol>) grammar.mapChromosome(c);
+		StringBuilder sb = new StringBuilder();
+		for(Symbol symb:ss)sb.append(symb.getName());
+		
+		System.out.println(sb.toString());
+
 		BasicPlane plane = BasicPlane.construct(40d, 5d, 2d, 5d);
 		System.out.println(plane);
+		
+		List<BasicPlaneShape>shapes = BasicPlaneShape.parseShapes(plane, "tri(upperRightCorner,endBase,upperLeftCorner);");
+		plane.addShapes(shapes);
+		/*plane.addShape(new BasicPlaneShape(plane.upperRightCorner,
+				   plane.endBase,
+				   plane.upperLeftCorner)
+				   );*/
 		/*plane.addShape(new BasicPlaneShape(plane.upperRightCorner,
 										   plane.endBase,
 										   Vector3D.add(plane.upperRightCorner, Vector3D.of(0f, 0f, 5f))
@@ -329,7 +349,7 @@ public class PlaneViewer extends JPanel{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			engine.step(0.1d);
+			//engine.step(0.1d);
 			panel.repaint();
 		}
 	}

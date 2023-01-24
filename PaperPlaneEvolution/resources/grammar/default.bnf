@@ -1,7 +1,7 @@
-<STRUCTURE> -> <STRUCTURE>|<SHAPE>;<STRUCTURE>.
+<STRUCTURE> -> <SHAPE>;|<SHAPE>;<STRUCTURE>.
 <SHAPE> -> <TRIANGLE>|<SQUARE>.
-<TRIANGLE> -> <POINT><POINT><POINT>.
-<SQUARE> -> <POINT><POINT><POINT><POINT>.
+<TRIANGLE> -> tri(<POINT>,<POINT>,<POINT>).
+<SQUARE> -> cuad(<POINT>,<POINT>,<POINT>,<POINT>).
 <POINT> -> <BASEPOINT>|<GENERALPOINT>.
 <BASEPOINT> -> startBase | middleBase | endBase | upperRightCorner | upperMiddleRight | upperLeftCorner | upperMiddleLeft.
 <GENERALPOINT> -> maxX | maxY | maxZ | minX | minY | minZ.

@@ -1,7 +1,12 @@
 package model;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import util.Triangle;
 import util.Vector3D;
@@ -10,6 +15,51 @@ public class BasicPlaneShape extends PlaneShape{
 	Vector3D points[];
 	public BasicPlaneShape(Vector3D ...points) {
 		this.points = points;
+	}
+	
+	public static List<BasicPlaneShape>parseShapes(BasicPlane plane, String text){
+		List<BasicPlaneShape> list = new ArrayList<BasicPlaneShape>();
+		
+		Pattern pattern = Pattern.compile("tri[^;]*;");
+		Matcher matcher = pattern.matcher(text);
+		while (matcher.find()) {
+			String atts[] = text.substring(matcher.start()+4, matcher.end()-2).split(",");
+			Vector3D vs[] = new Vector3D[3];
+			for(int i=0;i<3;i++) {
+				vs[i] = findPoint(plane, atts[i]);
+				//System.out.println(atts[i]+" "+vs[i]);
+				list.add(new BasicPlaneShape(vs));
+			}
+			
+		}
+		return list;
+	}
+	private static Vector3D findPoint(BasicPlane plane, String id) {
+		if(Pattern.matches("max.", id)||Pattern.matches("min.", id)) {
+			try {
+				Method m = BasicPlane.class.getDeclaredMethod(id, null);
+				return (Vector3D)m.invoke(plane, null);
+			} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		else {
+			try {
+				Field f = BasicPlane.class.getDeclaredField(id);
+				return (Vector3D)f.get(plane);
+			} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+	public static void main(String args[]) {
+		BasicPlane plane = BasicPlane.construct(40d, 5d, 2d, 5d);
+		System.out.println(plane);
+		List<BasicPlaneShape> shapes = parseShapes(plane, "tri(upperMiddleLeft,startBase,minZ);tri(maxX,maxY,maxZ);");
+		
 	}
 	@Override
 	public List<Triangle> getTriangles() {
