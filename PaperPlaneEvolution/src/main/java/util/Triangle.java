@@ -7,6 +7,10 @@ import java.awt.Color;
 public class Triangle {
 	public Vector3D points[];
 	public Color col = Color.gray;
+	
+	public double mass = 0.5d;
+	public Vector3D velocity = Vector3D.of(2d, 0d, 0d);
+	
 	public Triangle(Vector3D p1, Vector3D p2, Vector3D p3) {
 		points = new Vector3D[]{p1,p2,p3};
 	}
@@ -22,11 +26,11 @@ public class Triangle {
 		points[1] = new Vector3D(copy.points[1]);
 		points[2] = new Vector3D(copy.points[2]);
 	}
-	public static float dist(Vector3D pt, Vector3D plane_n, Vector3D plane_p) {
+	public static double dist(Vector3D pt, Vector3D plane_n, Vector3D plane_p) {
 		//Vector3D p = Vector3D.normal(pt);
 		Vector3D p = pt;
-		float e1 = (plane_n.x * p.x) + (plane_n.y * p.y) + (plane_n.z * p.z);
-		float e2 = Vector3D.dotProduct(plane_n, plane_p);
+		double e1 = (plane_n.x * p.x) + (plane_n.y * p.y) + (plane_n.z * p.z);
+		double e2 = Vector3D.dotProduct(plane_n, plane_p);
 		return e1 - e2;
 		//return (plane_n.x * p.x + plane_n.y * p.y + plane_n.z * p.z - Vector3D.dotProduct(plane_n, plane_p));
 
@@ -45,9 +49,9 @@ public class Triangle {
 		Vector3D outside_points[] = new Vector3D[3];; int nOutsidePointCount = 0;
 
 		// Get signed distance of each point in triangle to plane
-		float d0 = dist(in_tri.points[0],plane_n,plane_p);
-		float d1 = dist(in_tri.points[1],plane_n,plane_p);
-		float d2 = dist(in_tri.points[2],plane_n,plane_p);
+		double d0 = dist(in_tri.points[0],plane_n,plane_p);
+		double d1 = dist(in_tri.points[1],plane_n,plane_p);
+		double d2 = dist(in_tri.points[2],plane_n,plane_p);
 
 		if (d0 >= 0) { inside_points[nInsidePointCount++] = in_tri.points[0]; }
 		else { outside_points[nOutsidePointCount++] = in_tri.points[0]; }
@@ -129,7 +133,7 @@ public class Triangle {
 
 			return 2; // Return two newly formed triangles which form a quad
 		}
-		System.err.println("what");
+		
 		return 0;
 	}
 	@Override
