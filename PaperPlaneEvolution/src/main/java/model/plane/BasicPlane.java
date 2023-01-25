@@ -42,12 +42,14 @@ public class BasicPlane extends AbstractPlane{
 		
 		
 		
-		PlaneShape base1 = new BasicPlaneShape((Vector3D) plane.startBase.clone(), (Vector3D)plane.upperRightCorner.clone(), (Vector3D)plane.endBase.clone());
-		PlaneShape base2 = new BasicPlaneShape((Vector3D) plane.startBase.clone(), (Vector3D)plane.upperLeftCorner.clone(), (Vector3D)plane.endBase.clone());
-		plane.shapes.add(base1);
+		BasicPlaneShape base1 = new BasicPlaneShape((Vector3D) plane.startBase.clone(), (Vector3D)plane.upperRightCorner.clone(), (Vector3D)plane.endBase.clone());
+		BasicPlaneShape base2 = new BasicPlaneShape((Vector3D) plane.startBase.clone(), (Vector3D)plane.upperLeftCorner.clone(), (Vector3D)plane.endBase.clone());
+		/*plane.shapes.add(base1);
 		plane.shapes.add(base2);
 		plane.tris.addAll(base1.getTriangles());
-		plane.tris.addAll(base2.getTriangles());
+		plane.tris.addAll(base2.getTriangles());*/
+		plane.addShape(base1);
+		plane.addShape(base2);
 		return plane;
 	}
 	
@@ -83,12 +85,13 @@ public class BasicPlane extends AbstractPlane{
 	public Vector3D minZ() {
 		return min((Vector3D v)->v.z);
 	}
-	public void addShape(PlaneShape shape) {
+	public void addShape(BasicPlaneShape shape) {
+		shape.sortVertices();
 		shapes.add(shape);
 		tris.addAll(shape.getTriangles());
 	}
 	public void addShapes(Collection<BasicPlaneShape> shapes) {
-		for(PlaneShape shape:shapes) {
+		for(BasicPlaneShape shape:shapes) {
 			this.addShape(shape);
 		}
 	}
@@ -96,6 +99,7 @@ public class BasicPlane extends AbstractPlane{
 	public List<Triangle>getTriangles(){
 		return tris;
 	}
+	
 	
 	@Override
 	public String toString() {

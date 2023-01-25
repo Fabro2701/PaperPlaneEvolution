@@ -8,4 +8,6 @@ public abstract class PlaneShape {
 
 	public abstract List<Triangle> getTriangles();
 
+	
+
 }

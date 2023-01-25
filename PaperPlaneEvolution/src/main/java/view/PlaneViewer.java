@@ -283,8 +283,8 @@ public class PlaneViewer extends JPanel{
 		}
 	}
 	public static void main(String args[]) {
-		RandomSingleton.setSeed(30L);
-		Chromosome<Chromosome.Codon> c = new Chromosome<>(50, Chromosome.Codon::new);
+		RandomSingleton.setSeed(10L);
+		Chromosome<Chromosome.Codon> c = new Chromosome<>(500, Chromosome.Codon::new);
 		StandardGrammar grammar = new StandardGrammar();
 		grammar.parseBNF("resources/grammar/default.bnf");
 		LinkedList<Symbol>ss = (LinkedList<Symbol>) grammar.mapChromosome(c);
@@ -331,7 +331,7 @@ public class PlaneViewer extends JPanel{
 				Vector3D.add(plane.upperLeftCorner, Vector3D.of(0f, -2f, -5f)),
 				plane.endBase
 				));*/
-		
+		//BasicPlane plane2 = BasicPlane.construct(50d, 3d, 2d, 5d);
 		PlaneViewer panel = new PlaneViewer(plane);
 		SwingUtilities.invokeLater(()->{
 			JFrame frame = new JFrame();

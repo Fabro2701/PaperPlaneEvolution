@@ -4,7 +4,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -62,14 +64,14 @@ public class BasicPlaneShape extends PlaneShape{
 		case "BasePoint":
 			try {
 				Field f = BasicPlane.class.getDeclaredField(query.getString("value"));
-				return (Vector3D)f.get(plane);
+				return (Vector3D)((Vector3D)f.get(plane)).clone();
 			} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
 				e.printStackTrace();
 			}
 		case "GeneralPoint":
 			try {
 				Method m = BasicPlane.class.getDeclaredMethod(query.getString("value"), null);
-				return (Vector3D)m.invoke(plane, null);
+				return (Vector3D)((Vector3D)m.invoke(plane, null)).clone();
 			} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				e.printStackTrace();
 			}
@@ -147,30 +149,41 @@ public class BasicPlaneShape extends PlaneShape{
     	for(Vector3D v:this.points)sb.append(v).append(" ; ");
     	return sb.toString();
     }
-    /*public static List<BasicPlaneShape>parseShapes(BasicPlane plane, String text){
-	List<BasicPlaneShape> list = new ArrayList<BasicPlaneShape>();
-	
-	Pattern pattern = Pattern.compile("tri[^;]*;");
-	Matcher matcher = pattern.matcher(text);
-	while (matcher.find()) {
-		String atts[] = text.substring(matcher.start()+4, matcher.end()-2).split(",");
-		Vector3D vs[] = new Vector3D[3];
-		for(int i=0;i<3;i++) {
-			vs[i] = findPoint(plane, atts[i]);
-		}
-		list.add(new BasicPlaneShape(vs));			
+    public void sortVertices() {
+    	 // Encuentra el vértice con la coordenada z más baja (en caso de empate, el vértice con la coordenada y más baja, y en caso de empate, el vértice con la coordenada x más a la izquierda)
+        Vector3D reference = points[0];
+        for (Vector3D vertex : points) {
+            if (vertex.z < reference.z || (vertex.z == reference.z && vertex.y < reference.y) || (vertex.z == reference.z && vertex.y == reference.y && vertex.x < reference.x)) {
+                reference = vertex;
+            }
+        }
+        // Ordena los vértices de acuerdo al ángulo con el punto de referencia
+        Set<Vector3D> visited = new HashSet<>();
+        List<Vector3D> result = new ArrayList<>();
+        Vector3D current = reference;
+        result.add(current);
+        visited.add(current);
+        while (true) {
+        	Vector3D next = null;
+            for (Vector3D vertex : points) {
+                if (visited.contains(vertex)) continue;
+                if (next == null || isCounterClockwise(current, next, vertex)) {
+                    next = vertex;
+                }
+            }
+            if (next == reference) {
+                break;
+            }
+            result.add(next);
+            visited.add(next);
+            current = next;
+            if(result.size()==points.length)break;
+        }
+        
+        for(int i=0;i<points.length;i++)points[i]=result.get(i);
 	}
-	pattern = Pattern.compile("cuad[^;]*;");
-	matcher = pattern.matcher(text);
-	while (matcher.find()) {
-		String atts[] = text.substring(matcher.start()+5, matcher.end()-2).split(",");
-		Vector3D vs[] = new Vector3D[4];
-		for(int i=0;i<4;i++) {
-			vs[i] = findPoint(plane, atts[i]);
-		}
-		list.add(new BasicPlaneShape(vs));
-	}
-	return list;
-}
-*/
+    private boolean isCounterClockwise(Vector3D a, Vector3D b, Vector3D c) {
+        double crossProduct = (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+        return crossProduct > 0;
+    }
 }
