@@ -17,7 +17,7 @@ public class BasicPlane extends AbstractPlane{
 	public Vector3D upperLeftCorner, upperMiddleLeft;
 	
 	List<Triangle>tris;
-	List<PlaneShape>shapes;
+	List<BasicPlaneShape>shapes;
 	
 	private BasicPlane() {
 		this.tris = new ArrayList<>();
@@ -30,14 +30,19 @@ public class BasicPlane extends AbstractPlane{
 		plane.endBase = Vector3D.of(plane.startBase.x + baseLength, plane.startBase.y, plane.startBase.z);
 		plane.middleBase = Vector3D.of((plane.endBase.x - plane.startBase.x)/2f, plane.startBase.y, plane.startBase.z);
 		
+		double radAngle = bodyAngle*Math.PI/180d;
+		double cosAngle = Math.cos(radAngle);
+		double sinAngle = Math.sin(radAngle);
+		double opp = sinAngle*bodyHeight/cosAngle;
+		
 		plane.upperRightCorner = Vector3D.of(plane.startBase.x - backUpperCornerShift, 
 											 plane.startBase.y + bodyHeight, 
-											 plane.startBase.z + bodyAngle);
+											 plane.startBase.z + opp);
 		plane.upperMiddleRight = Vector3D.mul(Vector3D.add(plane.endBase, plane.upperRightCorner), 0.5d);
 		
 		plane.upperLeftCorner = Vector3D.of(plane.startBase.x - backUpperCornerShift, 
 											plane.startBase.y + bodyHeight, 
-											plane.startBase.z - bodyAngle);
+											plane.startBase.z - opp);
 		plane.upperMiddleLeft = Vector3D.mul(Vector3D.add(plane.endBase, plane.upperLeftCorner), 0.5d);
 		
 		
@@ -114,6 +119,9 @@ public class BasicPlane extends AbstractPlane{
 		sb.append("upperMiddleLeft ").append(upperMiddleLeft).append("\n");
 		
 		return sb.toString();
+	}
+	public List<BasicPlaneShape> getShapes() {
+		return shapes;
 	}
 	public static void main(String args[]) {
 		BasicPlane plane = BasicPlane.construct(50d, 10d, 10d, 15d);

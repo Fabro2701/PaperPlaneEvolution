@@ -79,10 +79,10 @@ public class BasicPlaneShape extends PlaneShape{
 		return null;
 	}
 	public static void main(String args[]) {
-		BasicPlane plane = BasicPlane.construct(40d, 5d, 2d, 5d);
+		
+		BasicPlane plane = parsePlaneAndShapes("plane(40,5,2,5);tri(upperMiddleLeft,+(upperMiddleLeft,middleBase),middleBase);");
 		System.out.println(plane);
-		List<BasicPlaneShape> shapes = parseAndAddShapes(plane, "plane(40,5,2,5);tri(upperMiddleLeft,+(upperMiddleLeft,middleBase),middleBase);");
-		for(BasicPlaneShape s:shapes)System.out.println(s);
+		for(BasicPlaneShape s:plane.getShapes())System.out.println(s);
 		
 	}
 	@Override

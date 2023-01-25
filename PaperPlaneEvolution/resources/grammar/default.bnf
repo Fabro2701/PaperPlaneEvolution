@@ -10,3 +10,4 @@
 <GENERALPOINT> -> maxX | maxY | maxZ | minX | minY | minZ.
 <NATURAL> -> <N>,<N>,<N>. 
 <N> -> 5|10|20|30|50.
+<ANGLE> -> <N>|70|88.
