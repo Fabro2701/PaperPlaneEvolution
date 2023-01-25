@@ -1,55 +1,72 @@
-package model;
+package model.plane.shapes;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import model.plane.BasicPlane;
 import util.Triangle;
 import util.Vector3D;
 
 public class BasicPlaneShape extends PlaneShape{
 	Vector3D points[];
 	public BasicPlaneShape(Vector3D ...points) {
+		if(points.length<3)System.err.println("Shapes need at least 3 points");
 		this.points = points;
 	}
 	
-	public static List<BasicPlaneShape>parseShapes(BasicPlane plane, String text){
+	public static List<BasicPlaneShape>parseShapes(BasicPlane plane, String description){
 		List<BasicPlaneShape> list = new ArrayList<BasicPlaneShape>();
 		
-		Pattern pattern = Pattern.compile("tri[^;]*;");
-		Matcher matcher = pattern.matcher(text);
-		while (matcher.find()) {
-			String atts[] = text.substring(matcher.start()+4, matcher.end()-2).split(",");
-			Vector3D vs[] = new Vector3D[3];
-			for(int i=0;i<3;i++) {
-				vs[i] = findPoint(plane, atts[i]);
-				//System.out.println(atts[i]+" "+vs[i]);
-				list.add(new BasicPlaneShape(vs));
+		ShapeParser parser = new ShapeParser();
+		JSONObject r = parser.parse(description);
+		
+		JSONArray shapes = r.getJSONArray("shapes");
+		for(int i=0;i<shapes.length();i++) {
+			JSONObject shape = shapes.getJSONObject(i);
+			//PolygonShape
+			JSONArray pts = shape.getJSONArray("points");
+			int l = pts.length();
+			Vector3D vs[] = new Vector3D[l];
+			for(int j=0;j<l;j++) {
+				vs[j] = findPoint(plane, pts.getJSONObject(j));
 			}
-			
+			list.add(new BasicPlaneShape(vs));
 		}
+		
 		return list;
 	}
-	private static Vector3D findPoint(BasicPlane plane, String id) {
-		if(Pattern.matches("max.", id)||Pattern.matches("min.", id)) {
+	private static Vector3D findPoint(BasicPlane plane, JSONObject query) {
+		String type = query.getString("type");
+		switch(type) {
+		case "NaturalPoint":
+			double x = query.getJSONObject("x").getDouble("value");
+			double y = query.getJSONObject("y").getDouble("value");
+			double z = query.getJSONObject("z").getDouble("value");
+			return Vector3D.of(x, y, z);
+		case "OperationPoint":
+			String op = query.getString("op");
+			Vector3D left = findPoint(plane, query.getJSONObject("left"));
+			Vector3D right = findPoint(plane, query.getJSONObject("right"));
+			if(op.equals("+"))return Vector3D.add(left, right);
+			else return Vector3D.sub(left, right);
+		case "BasePoint":
 			try {
-				Method m = BasicPlane.class.getDeclaredMethod(id, null);
-				return (Vector3D)m.invoke(plane, null);
-			} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		else {
-			try {
-				Field f = BasicPlane.class.getDeclaredField(id);
+				Field f = BasicPlane.class.getDeclaredField(query.getString("value"));
 				return (Vector3D)f.get(plane);
 			} catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
-				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		case "GeneralPoint":
+			try {
+				Method m = BasicPlane.class.getDeclaredMethod(query.getString("value"), null);
+				return (Vector3D)m.invoke(plane, null);
+			} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 				e.printStackTrace();
 			}
 		}
@@ -58,7 +75,8 @@ public class BasicPlaneShape extends PlaneShape{
 	public static void main(String args[]) {
 		BasicPlane plane = BasicPlane.construct(40d, 5d, 2d, 5d);
 		System.out.println(plane);
-		List<BasicPlaneShape> shapes = parseShapes(plane, "tri(upperMiddleLeft,startBase,minZ);tri(maxX,maxY,maxZ);");
+		List<BasicPlaneShape> shapes = parseShapes(plane, "plane(40,5,2,5);tri(upperMiddleLeft,+(upperMiddleLeft,middleBase),middleBase);");
+		for(BasicPlaneShape s:shapes)System.out.println(s);
 		
 	}
 	@Override
@@ -119,4 +137,36 @@ public class BasicPlaneShape extends PlaneShape{
         // Check if point is in triangle
         return (u >= 0) && (v >= 0) && (u + v < 1);
     }
+    @Override 
+    public String toString() {
+    	StringBuilder sb = new StringBuilder();
+    	for(Vector3D v:this.points)sb.append(v).append(" ; ");
+    	return sb.toString();
+    }
+    /*public static List<BasicPlaneShape>parseShapes(BasicPlane plane, String text){
+	List<BasicPlaneShape> list = new ArrayList<BasicPlaneShape>();
+	
+	Pattern pattern = Pattern.compile("tri[^;]*;");
+	Matcher matcher = pattern.matcher(text);
+	while (matcher.find()) {
+		String atts[] = text.substring(matcher.start()+4, matcher.end()-2).split(",");
+		Vector3D vs[] = new Vector3D[3];
+		for(int i=0;i<3;i++) {
+			vs[i] = findPoint(plane, atts[i]);
+		}
+		list.add(new BasicPlaneShape(vs));			
+	}
+	pattern = Pattern.compile("cuad[^;]*;");
+	matcher = pattern.matcher(text);
+	while (matcher.find()) {
+		String atts[] = text.substring(matcher.start()+5, matcher.end()-2).split(",");
+		Vector3D vs[] = new Vector3D[4];
+		for(int i=0;i<4;i++) {
+			vs[i] = findPoint(plane, atts[i]);
+		}
+		list.add(new BasicPlaneShape(vs));
+	}
+	return list;
+}
+*/
 }

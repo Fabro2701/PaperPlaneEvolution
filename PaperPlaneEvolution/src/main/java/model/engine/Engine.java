@@ -3,7 +3,7 @@ package model.engine;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import model.BasicPlane;
+import model.plane.BasicPlane;
 import util.Triangle;
 import util.Vector3D;
 

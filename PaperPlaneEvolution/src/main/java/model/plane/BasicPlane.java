@@ -1,4 +1,4 @@
-package model;
+package model.plane;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
+import model.plane.shapes.BasicPlaneShape;
+import model.plane.shapes.PlaneShape;
 import util.Triangle;
 import util.Vector3D;
 

@@ -20,13 +20,14 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-import model.BasicPlane;
-import model.BasicPlaneShape;
 import model.engine.Engine;
 import model.grammar.AbstractGrammar.Symbol;
+import model.plane.BasicPlane;
+import model.plane.shapes.BasicPlaneShape;
 import model.grammar.Chromosome;
 import model.grammar.StandardGrammar;
 import util.Matrix;
+import util.RandomSingleton;
 import util.Triangle;
 import util.Vector3D;
 
@@ -273,7 +274,7 @@ public class PlaneViewer extends JPanel{
 			}
 		});
 		for(Triangle t:trianglesToRaster) {
-			g2.setColor(Color.black);
+			g2.setColor(new Color(0,0,0,100));
 			g2.fillPolygon(new int[] {(int) t.points[0].x,(int)t.points[1].x,(int)t.points[2].x}, new int[] {(int)t.points[0].y,(int)t.points[1].y,(int)t.points[2].y}, 3);
 			
 			g2.setColor(Color.green);
@@ -282,6 +283,7 @@ public class PlaneViewer extends JPanel{
 		}
 	}
 	public static void main(String args[]) {
+		RandomSingleton.setSeed(20L);
 		Chromosome<Chromosome.Codon> c = new Chromosome<>(50, Chromosome.Codon::new);
 		StandardGrammar grammar = new StandardGrammar();
 		grammar.parseBNF("resources/grammar/default.bnf");
@@ -294,7 +296,9 @@ public class PlaneViewer extends JPanel{
 		BasicPlane plane = BasicPlane.construct(40d, 5d, 2d, 5d);
 		System.out.println(plane);
 		
-		List<BasicPlaneShape>shapes = BasicPlaneShape.parseShapes(plane, "tri(upperRightCorner,endBase,upperLeftCorner);");
+		String test = "tri(upperLeftCorner,endBase,);";
+		//List<BasicPlaneShape>shapes = BasicPlaneShape.parseShapes(plane, test);
+		List<BasicPlaneShape>shapes = BasicPlaneShape.parseShapes(plane, sb.toString());
 		plane.addShapes(shapes);
 		/*plane.addShape(new BasicPlaneShape(plane.upperRightCorner,
 				   plane.endBase,

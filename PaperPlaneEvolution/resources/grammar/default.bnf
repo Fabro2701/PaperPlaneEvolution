@@ -1,7 +1,12 @@
-<STRUCTURE> -> <SHAPE>;|<SHAPE>;<STRUCTURE>.
-<SHAPE> -> <TRIANGLE>|<SQUARE>.
+<PLANE> -> <PLANESPEC>;<STRUCTURE>.
+<PLANESPEC> -> plane(40,5,2,5).
+<STRUCTURE> -> <SHAPE>;<SHAPE>;<SHAPE>;|<SHAPE>;<STRUCTURE>.
+<SHAPE> -> <TRIANGLE>.
 <TRIANGLE> -> tri(<POINT>,<POINT>,<POINT>).
 <SQUARE> -> cuad(<POINT>,<POINT>,<POINT>,<POINT>).
-<POINT> -> <BASEPOINT>|<GENERALPOINT>.
+<POINT> -> <OP>(<POINT>,<POINT>)|<BASEPOINT>|<GENERALPOINT>|'N('<NATURAL>).
+<OP> -> '+'|'-'.
 <BASEPOINT> -> startBase | middleBase | endBase | upperRightCorner | upperMiddleRight | upperLeftCorner | upperMiddleLeft.
 <GENERALPOINT> -> maxX | maxY | maxZ | minX | minY | minZ.
+<NATURAL> -> <N>,<N>,<N>. 
+<N> -> 5|10|20|30|50.

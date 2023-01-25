@@ -1,4 +1,4 @@
-package model;
+package model.plane.shapes;
 
 import java.util.List;
 
