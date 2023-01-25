@@ -283,7 +283,7 @@ public class PlaneViewer extends JPanel{
 		}
 	}
 	public static void main(String args[]) {
-		RandomSingleton.setSeed(20L);
+		RandomSingleton.setSeed(30L);
 		Chromosome<Chromosome.Codon> c = new Chromosome<>(50, Chromosome.Codon::new);
 		StandardGrammar grammar = new StandardGrammar();
 		grammar.parseBNF("resources/grammar/default.bnf");
@@ -293,13 +293,14 @@ public class PlaneViewer extends JPanel{
 		
 		System.out.println(sb.toString());
 
-		BasicPlane plane = BasicPlane.construct(40d, 5d, 2d, 5d);
-		System.out.println(plane);
+		
 		
 		String test = "tri(upperLeftCorner,endBase,);";
 		//List<BasicPlaneShape>shapes = BasicPlaneShape.parseShapes(plane, test);
-		List<BasicPlaneShape>shapes = BasicPlaneShape.parseShapes(plane, sb.toString());
-		plane.addShapes(shapes);
+		
+		BasicPlane plane = BasicPlaneShape.parsePlaneAndShapes(sb.toString());
+		System.out.println(plane);
+		
 		/*plane.addShape(new BasicPlaneShape(plane.upperRightCorner,
 				   plane.endBase,
 				   plane.upperLeftCorner)

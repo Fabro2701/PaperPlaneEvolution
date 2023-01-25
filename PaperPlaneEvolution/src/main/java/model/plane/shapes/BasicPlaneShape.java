@@ -20,11 +20,16 @@ public class BasicPlaneShape extends PlaneShape{
 		this.points = points;
 	}
 	
-	public static List<BasicPlaneShape>parseShapes(BasicPlane plane, String description){
-		List<BasicPlaneShape> list = new ArrayList<BasicPlaneShape>();
-		
+	public static BasicPlane parsePlaneAndShapes(String description){
+				
 		ShapeParser parser = new ShapeParser();
 		JSONObject r = parser.parse(description);
+		
+		JSONArray planeD = r.getJSONArray("plane");
+		BasicPlane plane = BasicPlane.construct(planeD.getJSONObject(0).getDouble("value"),
+												planeD.getJSONObject(1).getDouble("value"),
+												planeD.getJSONObject(2).getDouble("value"),
+												planeD.getJSONObject(3).getDouble("value"));
 		
 		JSONArray shapes = r.getJSONArray("shapes");
 		for(int i=0;i<shapes.length();i++) {
@@ -36,10 +41,9 @@ public class BasicPlaneShape extends PlaneShape{
 			for(int j=0;j<l;j++) {
 				vs[j] = findPoint(plane, pts.getJSONObject(j));
 			}
-			list.add(new BasicPlaneShape(vs));
+			plane.addShape(new BasicPlaneShape(vs));
 		}
-		
-		return list;
+		return plane;
 	}
 	private static Vector3D findPoint(BasicPlane plane, JSONObject query) {
 		String type = query.getString("type");
@@ -75,7 +79,7 @@ public class BasicPlaneShape extends PlaneShape{
 	public static void main(String args[]) {
 		BasicPlane plane = BasicPlane.construct(40d, 5d, 2d, 5d);
 		System.out.println(plane);
-		List<BasicPlaneShape> shapes = parseShapes(plane, "plane(40,5,2,5);tri(upperMiddleLeft,+(upperMiddleLeft,middleBase),middleBase);");
+		List<BasicPlaneShape> shapes = parseAndAddShapes(plane, "plane(40,5,2,5);tri(upperMiddleLeft,+(upperMiddleLeft,middleBase),middleBase);");
 		for(BasicPlaneShape s:shapes)System.out.println(s);
 		
 	}
