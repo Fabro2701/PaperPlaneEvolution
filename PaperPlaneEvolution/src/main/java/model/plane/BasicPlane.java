@@ -23,7 +23,7 @@ public class BasicPlane extends AbstractPlane{
 		this.tris = new ArrayList<>();
 		this.shapes = new ArrayList<>();
 	}
-	public static BasicPlane construct(double baseLength, double backUpperCornerShift, double bodyAngle ,double bodyHeight) {
+	public static BasicPlane construct(double baseLength, double backUpperCornerShift, double bodyAngle, double bodyHeight) {
 		BasicPlane plane = new BasicPlane();
 		
 		plane.startBase = Vector3D.of(0d, 0d, 0d);

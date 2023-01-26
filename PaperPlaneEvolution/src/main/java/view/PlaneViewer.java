@@ -283,7 +283,7 @@ public class PlaneViewer extends JPanel{
 		}
 	}
 	public static void main(String args[]) {
-		RandomSingleton.setSeed(130L);
+		RandomSingleton.setSeed(1310L);
 		Chromosome<Chromosome.Codon> c = new Chromosome<>(500, Chromosome.Codon::new);
 		StandardGrammar grammar = new StandardGrammar();
 		grammar.parseBNF("resources/grammar/default.bnf");
@@ -295,12 +295,20 @@ public class PlaneViewer extends JPanel{
 
 		
 		
-		String test = "tri(0,endBase,);";
-		BasicPlane plane2 = BasicPlane.construct(50d, 3d, 88d, 5d);
+		String test = "plane(40,0,45,10);cuad(upperRightCorner,+(upperRightCorner,N(0,0,5)),+(upperRightCorner,N(5,-3,7)),endBase);";
+		//String test = "plane(40,0,45,10);tri(upperRightCorner,+(upperRightCorner,N(5,-3,7)),endBase);tri(upperRightCorner,+(upperRightCorner,N(0,0,5)),+(upperRightCorner,N(5,-3,7)));";
+/*
+(0.0, 0.0, 0.0) , (0.0, 10.0, 9.999999999999998) , (40.0, 0.0, 0.0)
+(0.0, 10.0, -9.999999999999998) , (40.0, 0.0, 0.0) , (0.0, 0.0, 0.0)
+(40.0, 0.0, 0.0) , (5.0, 7.0, 17.0) , (0.0, 10.0, 9.999999999999998)
+(0.0, 10.0, 9.999999999999998) , (0.0, 10.0, 14.999999999999998) , (5.0, 7.0, 17.0)
+ */
+		BasicPlane plane2 = BasicPlaneShape.parsePlaneAndShapes(test);
+		plane2.getTriangles().stream().forEach(s -> System.out.println(s));
 		
 		BasicPlane plane = BasicPlaneShape.parsePlaneAndShapes(sb.toString());
 		
-		System.out.println(plane);
+		System.out.println(plane2);
 		
 		/*plane.addShape(new BasicPlaneShape(plane.upperRightCorner,
 				   plane.endBase,

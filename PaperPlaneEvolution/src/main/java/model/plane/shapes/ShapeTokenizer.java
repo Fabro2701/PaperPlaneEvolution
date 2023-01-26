@@ -22,7 +22,7 @@ public class ShapeTokenizer{
    		  {"^[(]","("},
    		  {"^[)]",")"},
    		  {"^[,]",","},
-		  {"^[0-9.]+f?d?","NUMBER"},
+		  {"^-?[0-9.]+f?d?","NUMBER"},
    		  {"^[+-]","ADDITIVE_OPERATOR"},
    		  {"^[*/]","MULTIPLICATIVE_OPERATOR"},
 		  {"^\"[^\"]*\"","STRING"}
