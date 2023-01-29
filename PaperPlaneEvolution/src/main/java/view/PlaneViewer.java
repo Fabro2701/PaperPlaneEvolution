@@ -274,7 +274,8 @@ public class PlaneViewer extends JPanel{
 			}
 		});
 		for(Triangle t:trianglesToRaster) {
-			g2.setColor(t.col==null ? new Color(0,0,0,100) : t.col);
+			//g2.setColor(t.col==null ? new Color(0,0,0,100) : t.col);
+			g2.setColor(new Color(0,0,0,100));
 			g2.fillPolygon(new int[] {(int) t.points[0].x,(int)t.points[1].x,(int)t.points[2].x}, new int[] {(int)t.points[0].y,(int)t.points[1].y,(int)t.points[2].y}, 3);
 			
 			g2.setColor(new Color(0,255,0,100));
@@ -283,7 +284,7 @@ public class PlaneViewer extends JPanel{
 		}
 	}
 	public static void main(String args[]) {
-		RandomSingleton.setSeed(130L);
+		RandomSingleton.setSeed(11L);
 		Chromosome<Chromosome.Codon> c = new Chromosome<>(500, Chromosome.Codon::new);
 		StandardGrammar grammar = new StandardGrammar();
 		grammar.parseBNF("resources/grammar/default.bnf");
@@ -297,7 +298,9 @@ public class PlaneViewer extends JPanel{
 		
 		//String test = "plane(40,0,45,10);cuad(upperRightCorner,+(upperRightCorner,N(0,0,5)),+(upperRightCorner,N(5,-3,7)),endBase);";
 		String test = "plane(40,0,20,10);tri(upperRightCorner,+(upperRightCorner,N(5,-2,7)),endBase);tri(upperRightCorner,+(upperRightCorner,N(0,0,5)),+(upperRightCorner,N(5,-2,7)));"+
-						"tri(upperLeftCorner,+(upperLeftCorner,N(5,-2,-7)),endBase);tri(upperLeftCorner,+(upperLeftCorner,N(0,0,-5)),+(upperLeftCorner,N(5,-2,-7)));";
+						"tri(upperLeftCorner,+(upperLeftCorner,N(5,-2,-7)),endBase);tri(upperLeftCorner,+(upperLeftCorner,N(0,0,-5)),+(upperLeftCorner,N(5,-2,-7)));"+
+						"tri(+(N(-1,0,0),endBase),+(N(5,0,-10),minZ),+(N(0,0,0),minZ));"+
+						"tri(+(N(-1,0,0),endBase),+(N(5,0,10),maxZ),+(N(0,0,0),maxZ));";
 		int op = 0;
 		BasicPlane plane = null;
 		
@@ -363,12 +366,12 @@ public class PlaneViewer extends JPanel{
 		Engine engine = new Engine(plane);
 		while(true) {
 			try {
-				Thread.sleep(100L);
+				Thread.sleep(300L);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			engine.step(0.1d);
+			engine.step(0.001d);
 			panel.repaint();
 		}
 	}

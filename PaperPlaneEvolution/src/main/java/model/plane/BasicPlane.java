@@ -114,31 +114,31 @@ public class BasicPlane extends AbstractPlane{
 		neighMap = TriangleMap.init(this.tris);
 		System.out.println(neighMap);
 	}
-	public static class TriangleMap extends HashMap<Triangle, HashSet<Triangle>>{
+	public static class TriangleMap extends HashMap<Triangle, HashMap<Triangle, List<Integer>>>{
 		public static TriangleMap init(List<Triangle>tris) {
-			
-			
-			
 			
 			TriangleMap map = new TriangleMap();
 			for(Triangle t1:tris) {
+				map.put(t1, new HashMap<>());
 				for(Triangle t2:tris) {
-					if(t1!=t2 && isTriangleNeighbor(t1, t2)) {
-						map.computeIfAbsent(t1, (t)->new HashSet<Triangle>()).add(t2);
+					List<Integer>pos;
+					if(t1!=t2 && (pos=isTriangleNeighbor(t1, t2)).size()>0) {
+						map.get(t1).put(t2, pos);
 					}
 				}
 			}
 			
-			Triangle test = tris.get(5);
-			test.col = new Color(255,0,0,255);
-			for(Triangle t:map.get(test)) {
-				t.col = test.col;
-			}
-			test.col = new Color(0,0,0,255);
+//			Triangle test = tris.get(tris.size()-1);
+//			test.col = new Color(255,0,0,255);
+//			for(Triangle t:map.get(test)) {
+//				t.col = test.col;
+//			}
+//			test.col = new Color(0,0,0,255);
 			return map;
 		}
-		private static boolean isTriangleNeighbor(Triangle triangle1, Triangle triangle2) {
-	        for (int i = 0; i < 3; i++) {
+		private static List<Integer> isTriangleNeighbor(Triangle triangle1, Triangle triangle2) {
+			List<Integer> pos = new ArrayList<>();
+			for (int i = 0; i < 3; i++) {
 	            for (int j = 0; j < 3; j++) {
 	                double x = 0;
 	                double y = 0, z = 0;
@@ -157,14 +157,15 @@ public class BasicPlane extends AbstractPlane{
                     f = triangle2.points[(j+1)% 3].z;
 	               
 	                if (x == a && y == b && z == c) {
-	                    return true;
+	                    pos.add(j);
 	                }
-	                if ((x - a) * (x - d) + (y - b) * (y - e) + (z - c) * (z - f) == 0) {
-	                    return true;
+	                else if ((x - a) * (x - d) + (y - b) * (y - e) + (z - c) * (z - f) == 0d) {
+	                	pos.add(j);
+	                    pos.add((j+1)% 3);
 	                }
 	            }
 	        }
-	        return false;
+	        return pos;
 	    }
 		@Override
 		public String toString() {
@@ -172,7 +173,7 @@ public class BasicPlane extends AbstractPlane{
 			
 			for(Triangle t:this.keySet()) {
 				StringJoiner sj = new StringJoiner("\n\t","["+t.toString()+"]-->\n\t","\n");
-				for(Triangle t2:this.get(t))sj.add(t2.toString());
+				//for(Triangle t2:this.get(t))sj.add(t2.toString());
 				sb.append(sj.toString());
 			}
 			
@@ -196,6 +197,9 @@ public class BasicPlane extends AbstractPlane{
 	}
 	public List<BasicPlaneShape> getShapes() {
 		return shapes;
+	}
+	public TriangleMap getNeighMap() {
+		return neighMap;
 	}
 	public static void main(String args[]) {
 		BasicPlane plane = BasicPlane.construct(50d, 10d, 10d, 15d);
