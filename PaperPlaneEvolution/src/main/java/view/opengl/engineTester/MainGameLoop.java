@@ -8,6 +8,7 @@ import java.util.List;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector3f;
 
+import model.engine.Engine;
 import model.grammar.Chromosome;
 import model.grammar.StandardGrammar;
 import model.grammar.AbstractGrammar.Symbol;
@@ -30,6 +31,7 @@ public class MainGameLoop {
 	protected static class Atts{
 		float[] vertices, textureCoords;
 		int[] indices;
+		BasicPlane plane;
 	}
 	public static Atts generatePlane() {
 		
@@ -53,17 +55,18 @@ public class MainGameLoop {
 (40.0, 0.0, 0.0) , (5.0, 7.0, 17.0) , (0.0, 10.0, 9.999999999999998)
 (0.0, 10.0, 9.999999999999998) , (0.0, 10.0, 14.999999999999998) , (5.0, 7.0, 17.0)
  */
-		BasicPlane plane2 = BasicPlaneShape.parsePlaneAndShapes(sb.toString());
+		Atts atts = new Atts();
+		atts.plane = BasicPlaneShape.parsePlaneAndShapes(sb.toString());
 		//BasicPlane plane2 = BasicPlaneShape.parsePlaneAndShapes(test);
-		plane2.getTriangles().stream().forEach(s -> System.out.println(s));
+		atts.plane.getTriangles().stream().forEach(s -> System.out.println(s));
 		
 
-		Atts atts = new Atts();
-		atts.vertices = new float[plane2.getTriangles().size()*3*3];
-		atts.textureCoords = new float[plane2.getTriangles().size()*3*2];
-		atts.indices = new int[plane2.getTriangles().size()*3];
+		List<Triangle> tris = atts.plane.getTriangles();
 		
-		List<Triangle> tris = plane2.getTriangles();
+		atts.vertices = new float[tris.size()*3*3];
+		atts.textureCoords = new float[tris.size()*3*2];
+		atts.indices = new int[tris.size()*3];
+		
 		for(int i=0;i<tris.size()*3;i++) {
 			atts.indices[i]=i;
 		}
@@ -86,6 +89,24 @@ public class MainGameLoop {
 		return atts;
 	}
 	public static void main(String[] args) {
+		Atts atts = MainGameLoop.generatePlane();
+		new Thread(){
+		    public void run(){
+		    	Engine engine = new Engine(atts.plane);
+				while(true) {
+					try {
+						Thread.sleep(100L);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					engine.step(0.1d);
+				}
+		    }
+		  }.start();
+		
+		launchView(atts);
+	}
+	public static void launchView(Atts atts) {
 
 		DisplayManager.createDisplay();
 		Loader loader = new Loader();
@@ -93,88 +114,11 @@ public class MainGameLoop {
 		Renderer renderer = new Renderer(shader);
 		
 		
-		Atts atts = MainGameLoop.generatePlane();
+		
 		float[] vertices = atts.vertices;
 		int[] indices = atts.indices;
 		float[] textureCoords = atts.textureCoords;
-//		float[] vertices = {			
-//				-0.5f,0.5f,0,	
-//				-0.5f,-0.5f,0,	
-//				0.5f,-0.5f,0,	
-//				0.5f,0.5f,0,		
-//				
-//				-0.5f,0.5f,1,	
-//				-0.5f,-0.5f,1,	
-//				0.5f,-0.5f,1,	
-//				0.5f,0.5f,1,
-//				
-//				0.5f,0.5f,0,	
-//				0.5f,-0.5f,0,	
-//				0.5f,-0.5f,1,	
-//				0.5f,0.5f,1,
-//				
-//				-0.5f,0.5f,0,	
-//				-0.5f,-0.5f,0,	
-//				-0.5f,-0.5f,1,	
-//				-0.5f,0.5f,1,
-//				
-//				-0.5f,0.5f,1,
-//				-0.5f,0.5f,0,
-//				0.5f,0.5f,0,
-//				0.5f,0.5f,1,
-//				
-//				-0.5f,-0.5f,1,
-//				-0.5f,-0.5f,0,
-//				0.5f,-0.5f,0,
-//				0.5f,-0.5f,1
-//				
-//		};
-//		
-//		float[] textureCoords = {
-//				
-//				0,0,
-//				0,1,
-//				1,1,
-//				1,0,			
-//				0,0,
-//				0,1,
-//				1,1,
-//				1,0,			
-//				0,0,
-//				0,1,
-//				1,1,
-//				1,0,
-//				0,0,
-//				0,1,
-//				1,1,
-//				1,0,
-//				0,0,
-//				0,1,
-//				1,1,
-//				1,0,
-//				0,0,
-//				0,1,
-//				1,1,
-//				1,0
-//
-//				
-//		};
-//		
-//		int[] indices = {
-//				0,1,3,	
-//				3,1,2,	
-//				4,5,7,
-//				7,5,6,
-//				8,9,11,
-//				11,9,10,
-//				12,13,15,
-//				15,13,14,	
-//				16,17,19,
-//				19,17,18,
-//				20,21,23,
-//				23,21,22
-//
-//		};
+
 		/*float[] vertices = {			
 				0,0,0,	
 				40f,0,0,
@@ -216,14 +160,15 @@ public class MainGameLoop {
 		
 		RawModel model = loader.loadToVAO(vertices,textureCoords,indices);
 		
-		TexturedModel staticModel = new TexturedModel(model,new ModelTexture(loader.loadTexture("resources/planeimg.jpg")));
+		TexturedModel staticModel = new TexturedModel(model,new ModelTexture(loader.loadTexture("resources/planeimg2.jpg")));
 		
 		Entity entity = new Entity(staticModel, new Vector3f(0,0,-5),0,0,0,0.1f);
 		
 		Camera camera = new Camera();
 		
+		
 		while(!Display.isCloseRequested()){
-			entity.increaseRotation(0.5f, 0.5f, 0.5f);
+			//entity.increaseRotation(0.5f, 0.5f, 0.5f);
 			camera.move();
 			renderer.prepare();
 			shader.start();
@@ -231,6 +176,7 @@ public class MainGameLoop {
 			renderer.render(entity,shader);
 			shader.stop();
 			DisplayManager.updateDisplay();
+		
 		}
 
 		shader.cleanUp();

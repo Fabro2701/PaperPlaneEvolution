@@ -1,13 +1,16 @@
 package model.plane;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.function.Function;
 
 import model.plane.shapes.BasicPlaneShape;
-import model.plane.shapes.PlaneShape;
 import util.Triangle;
 import util.Vector3D;
 
@@ -16,8 +19,11 @@ public class BasicPlane extends AbstractPlane{
 	public Vector3D upperRightCorner, upperMiddleRight;
 	public Vector3D upperLeftCorner, upperMiddleLeft;
 	
+	
 	List<Triangle>tris;
 	List<BasicPlaneShape>shapes;
+	
+	TriangleMap neighMap;
 	
 	private BasicPlane() {
 		this.tris = new ArrayList<>();
@@ -104,7 +110,75 @@ public class BasicPlane extends AbstractPlane{
 	public List<Triangle>getTriangles(){
 		return tris;
 	}
-	
+	public void consolidate() {
+		neighMap = TriangleMap.init(this.tris);
+		System.out.println(neighMap);
+	}
+	public static class TriangleMap extends HashMap<Triangle, HashSet<Triangle>>{
+		public static TriangleMap init(List<Triangle>tris) {
+			
+			
+			
+			
+			TriangleMap map = new TriangleMap();
+			for(Triangle t1:tris) {
+				for(Triangle t2:tris) {
+					if(t1!=t2 && isTriangleNeighbor(t1, t2)) {
+						map.computeIfAbsent(t1, (t)->new HashSet<Triangle>()).add(t2);
+					}
+				}
+			}
+			
+			Triangle test = tris.get(5);
+			test.col = new Color(255,0,0,255);
+			for(Triangle t:map.get(test)) {
+				t.col = test.col;
+			}
+			test.col = new Color(0,0,0,255);
+			return map;
+		}
+		private static boolean isTriangleNeighbor(Triangle triangle1, Triangle triangle2) {
+	        for (int i = 0; i < 3; i++) {
+	            for (int j = 0; j < 3; j++) {
+	                double x = 0;
+	                double y = 0, z = 0;
+	                double a = 0, b = 0, c = 0, d = 0, e = 0, f = 0;
+	                
+	                x = triangle1.points[i].x;
+	                y = triangle1.points[i].y;
+	                z = triangle1.points[i].z;
+	                 
+	                
+	                a = triangle2.points[j].x;
+                    b = triangle2.points[j].y;
+                    c = triangle2.points[j].z;
+                    d = triangle2.points[(j+1)% 3].x;
+                    e = triangle2.points[(j+1)% 3].y;
+                    f = triangle2.points[(j+1)% 3].z;
+	               
+	                if (x == a && y == b && z == c) {
+	                    return true;
+	                }
+	                if ((x - a) * (x - d) + (y - b) * (y - e) + (z - c) * (z - f) == 0) {
+	                    return true;
+	                }
+	            }
+	        }
+	        return false;
+	    }
+		@Override
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+			
+			for(Triangle t:this.keySet()) {
+				StringJoiner sj = new StringJoiner("\n\t","["+t.toString()+"]-->\n\t","\n");
+				for(Triangle t2:this.get(t))sj.add(t2.toString());
+				sb.append(sj.toString());
+			}
+			
+			return sb.toString();
+		}                 
+	}
 	
 	@Override
 	public String toString() {

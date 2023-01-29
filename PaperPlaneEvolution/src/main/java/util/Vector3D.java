@@ -38,7 +38,7 @@ public class Vector3D implements Cloneable{
 		return l.x*r.x + l.y*r.y + l.z*r.z;
 	}
 	public static double length(Vector3D l) {
-		return (double) Math.sqrt(Vector3D.dotProduct(l, l));
+		return Math.sqrt(Vector3D.dotProduct(l, l));
 	}
 	public static Vector3D normal(Vector3D l) {
 		double aux = Vector3D.length(l);
@@ -64,6 +64,11 @@ public class Vector3D implements Cloneable{
 	}
 	public static Vector3D add(Vector3D l, double r) {
 		return new Vector3D(l.x+r,l.y+r,l.z+r);
+	}
+	public void add(Vector3D l) {
+		this.x+=l.x;
+		this.y+=l.y;
+		this.z+=l.z;
 	}
 	public static Vector3D multiplyMatrix(Vector3D l, Matrix m) {
 		Vector3D v = new Vector3D(0f,0f,0f);

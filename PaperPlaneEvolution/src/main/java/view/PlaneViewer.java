@@ -150,7 +150,7 @@ public class PlaneViewer extends JPanel{
 	}
 
 	private void init() {
-		this.tris = this.plane.getTriangles();
+		
 		this.repaint();
 	}
 	@Override
@@ -189,7 +189,7 @@ public class PlaneViewer extends JPanel{
 		Matrix matView = Matrix.Matrix_QuickInverse(matCamera);
 
 		List<Triangle>trianglesToRaster = new ArrayList<Triangle>();
-		//System.out.println(this.lookDir);
+		this.tris = this.plane.getTriangles();
 		for(Triangle tri:this.tris) {
 			//System.out.println("printingini: "+tri.toString());
 			Triangle triTransformed = new Triangle(Vector3D.multiplyMatrix(tri.points[0], matWorld),
@@ -274,16 +274,16 @@ public class PlaneViewer extends JPanel{
 			}
 		});
 		for(Triangle t:trianglesToRaster) {
-			g2.setColor(new Color(0,0,0,100));
+			g2.setColor(t.col==null ? new Color(0,0,0,100) : t.col);
 			g2.fillPolygon(new int[] {(int) t.points[0].x,(int)t.points[1].x,(int)t.points[2].x}, new int[] {(int)t.points[0].y,(int)t.points[1].y,(int)t.points[2].y}, 3);
 			
-			g2.setColor(Color.green);
+			g2.setColor(new Color(0,255,0,100));
 			g2.drawPolygon(new int[] {(int) t.points[0].x,(int)t.points[1].x,(int)t.points[2].x}, new int[] {(int)t.points[0].y,(int)t.points[1].y,(int)t.points[2].y}, 3);
 			
 		}
 	}
 	public static void main(String args[]) {
-		RandomSingleton.setSeed(1310L);
+		RandomSingleton.setSeed(130L);
 		Chromosome<Chromosome.Codon> c = new Chromosome<>(500, Chromosome.Codon::new);
 		StandardGrammar grammar = new StandardGrammar();
 		grammar.parseBNF("resources/grammar/default.bnf");
@@ -295,20 +295,25 @@ public class PlaneViewer extends JPanel{
 
 		
 		
-		String test = "plane(40,0,45,10);cuad(upperRightCorner,+(upperRightCorner,N(0,0,5)),+(upperRightCorner,N(5,-3,7)),endBase);";
-		//String test = "plane(40,0,45,10);tri(upperRightCorner,+(upperRightCorner,N(5,-3,7)),endBase);tri(upperRightCorner,+(upperRightCorner,N(0,0,5)),+(upperRightCorner,N(5,-3,7)));";
-/*
-(0.0, 0.0, 0.0) , (0.0, 10.0, 9.999999999999998) , (40.0, 0.0, 0.0)
-(0.0, 10.0, -9.999999999999998) , (40.0, 0.0, 0.0) , (0.0, 0.0, 0.0)
-(40.0, 0.0, 0.0) , (5.0, 7.0, 17.0) , (0.0, 10.0, 9.999999999999998)
-(0.0, 10.0, 9.999999999999998) , (0.0, 10.0, 14.999999999999998) , (5.0, 7.0, 17.0)
- */
-		BasicPlane plane2 = BasicPlaneShape.parsePlaneAndShapes(test);
-		plane2.getTriangles().stream().forEach(s -> System.out.println(s));
+		//String test = "plane(40,0,45,10);cuad(upperRightCorner,+(upperRightCorner,N(0,0,5)),+(upperRightCorner,N(5,-3,7)),endBase);";
+		String test = "plane(40,0,20,10);tri(upperRightCorner,+(upperRightCorner,N(5,-2,7)),endBase);tri(upperRightCorner,+(upperRightCorner,N(0,0,5)),+(upperRightCorner,N(5,-2,7)));"+
+						"tri(upperLeftCorner,+(upperLeftCorner,N(5,-2,-7)),endBase);tri(upperLeftCorner,+(upperLeftCorner,N(0,0,-5)),+(upperLeftCorner,N(5,-2,-7)));";
+		int op = 0;
+		BasicPlane plane = null;
 		
-		BasicPlane plane = BasicPlaneShape.parsePlaneAndShapes(sb.toString());
+		if(op==0) {
+			plane = BasicPlaneShape.parsePlaneAndShapes(test);
+			plane.consolidate();
+			plane.getTriangles().stream().forEach(s -> System.out.println(s));
+			
+		}
+		else {
+			plane = BasicPlaneShape.parsePlaneAndShapes(sb.toString());
+			plane.consolidate();
+		}
 		
-		System.out.println(plane2);
+		
+		System.out.println(plane);
 		
 		/*plane.addShape(new BasicPlaneShape(plane.upperRightCorner,
 				   plane.endBase,
@@ -363,7 +368,7 @@ public class PlaneViewer extends JPanel{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			//engine.step(0.1d);
+			engine.step(0.1d);
 			panel.repaint();
 		}
 	}

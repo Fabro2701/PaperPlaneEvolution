@@ -8,11 +8,14 @@ public class Triangle {
 	public Vector3D points[];
 	public Color col = Color.gray;
 	
-	public double mass = 0.5d;
+	public double mass;
 	public Vector3D velocity = Vector3D.of(2d, 0d, 0d);
 	
 	public Triangle(Vector3D p1, Vector3D p2, Vector3D p3) {
 		points = new Vector3D[]{p1,p2,p3};
+		
+	    double area = Vector3D.length(Vector3D.crossProduct(Vector3D.sub(p2, p1), Vector3D.sub(p3, p1)))/2d;
+	    mass = area*0.1d;
 	}
 	public static Triangle of(Vector3D p1, Vector3D p2, Vector3D p3) {
 		return new Triangle(p1,p2,p3);
