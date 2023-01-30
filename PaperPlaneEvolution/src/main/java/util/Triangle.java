@@ -11,6 +11,7 @@ public class Triangle {
 	public double mass;
 	public Vector3D velocity = Vector3D.of(0d, 0d, 0d);
 	public Vector3D force[] = new Vector3D[] {Vector3D.of(0d, 0d, 0d),Vector3D.of(0d, 0d, 0d),Vector3D.of(0d, 0d, 0d)};
+	public Vector3D tmpforce[] = new Vector3D[] {Vector3D.of(0d, 0d, 0d),Vector3D.of(0d, 0d, 0d),Vector3D.of(0d, 0d, 0d)};
 	
 	public Triangle(Vector3D p1, Vector3D p2, Vector3D p3) {
 		points = new Vector3D[]{p1,p2,p3};

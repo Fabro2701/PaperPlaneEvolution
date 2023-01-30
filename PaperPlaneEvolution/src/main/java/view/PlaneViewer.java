@@ -297,10 +297,17 @@ public class PlaneViewer extends JPanel{
 		
 		
 		//String test = "plane(40,0,45,10);cuad(upperRightCorner,+(upperRightCorner,N(0,0,5)),+(upperRightCorner,N(5,-3,7)),endBase);";
-		String test = "plane(40,0,20,10);tri(upperRightCorner,+(upperRightCorner,N(5,-2,7)),endBase);tri(upperRightCorner,+(upperRightCorner,N(0,0,5)),+(upperRightCorner,N(5,-2,7)));"+
+		/*String test = "plane(40,0,20,10);tri(upperRightCorner,+(upperRightCorner,N(5,-2,7)),endBase);tri(upperRightCorner,+(upperRightCorner,N(0,0,5)),+(upperRightCorner,N(5,-2,7)));"+
 						"tri(upperLeftCorner,+(upperLeftCorner,N(5,-2,-7)),endBase);tri(upperLeftCorner,+(upperLeftCorner,N(0,0,-5)),+(upperLeftCorner,N(5,-2,-7)));"+
 						"tri(+(N(-1,0,0),endBase),+(N(5,0,-10),minZ),+(N(0,0,0),minZ));"+
 						"tri(+(N(-1,0,0),endBase),+(N(5,0,10),maxZ),+(N(0,0,0),maxZ));";
+		*/
+		String test = "plane(40,0,20,10);tri(upperRightCorner,+(upperRightCorner,N(5,-2,7)),endBase);tri(upperRightCorner,+(upperRightCorner,N(0,0,5)),+(upperRightCorner,N(5,-2,7)));"+
+				"tri(upperLeftCorner,+(upperLeftCorner,N(5,-2,-7)),endBase);tri(upperLeftCorner,+(upperLeftCorner,N(0,0,-5)),+(upperLeftCorner,N(5,-2,-7)));"+
+				"tri(endBase,+(N(5,0,-10),minZ),+(N(0,0,0),minZ));"+
+				"tri(endBase,+(N(5,0,10),maxZ),+(N(0,0,0),maxZ));";
+
+		//String test = "plane(40,0,20,10);";
 		int op = 0;
 		BasicPlane plane = null;
 		

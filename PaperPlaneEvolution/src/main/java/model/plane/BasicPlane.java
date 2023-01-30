@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.StringJoiner;
 import java.util.function.Function;
 
@@ -23,7 +24,7 @@ public class BasicPlane extends AbstractPlane{
 	List<Triangle>tris;
 	List<BasicPlaneShape>shapes;
 	
-	TriangleMap neighMap;
+	PointMap neighMap;
 	
 	private BasicPlane() {
 		this.tris = new ArrayList<>();
@@ -111,57 +112,80 @@ public class BasicPlane extends AbstractPlane{
 		return tris;
 	}
 	public void consolidate() {
-		neighMap = TriangleMap.init(this.tris);
+		neighMap = PointMap.init(this.tris);
 		System.out.println(neighMap);
 	}
-	public static class TriangleMap extends HashMap<Triangle, HashMap<Triangle, List<Integer>>>{
-		public static TriangleMap init(List<Triangle>tris) {
+	public static class PointMap extends HashMap<Vector3D, List<Vector3D>>{
+		public static PointMap init(List<Triangle>tris) {
 			
-			TriangleMap map = new TriangleMap();
+			PointMap map = new PointMap();
 			for(Triangle t1:tris) {
-				map.put(t1, new HashMap<>());
 				for(Triangle t2:tris) {
-					List<Integer>pos;
-					if(t1!=t2 && (pos=isTriangleNeighbor(t1, t2)).size()>0) {
-						map.get(t1).put(t2, pos);
+					HashMap<Vector3D, ArrayList<Vector3D>> pos = null;
+					if(t1!=t2 && !((pos=isTriangleNeighbor(t1, t2)).isEmpty())) {
+						for(Vector3D k:pos.keySet()) {
+							map.computeIfAbsent(k, (v)->new ArrayList<>()).addAll(pos.get(k));
+						}
 					}
+					
+					
 				}
+				
 			}
 			
 //			Triangle test = tris.get(tris.size()-1);
 //			test.col = new Color(255,0,0,255);
-//			for(Triangle t:map.get(test)) {
-//				t.col = test.col;
+//			for(Triangle t1:tris) {
+//				if(t1!=test) {
+//					for(int i=0;i<3;i++) {
+//						for(int j=0;j<3;j++) {
+//							if(map.containsKey(test.points[i])) {
+//								if(map.get(test.points[i]).contains(t1.points[j])) {
+//									t1.col=test.col;
+//									break;
+//								}
+//							}
+//							
+//						}
+//					}
+//				}
 //			}
 //			test.col = new Color(0,0,0,255);
+			
 			return map;
 		}
-		private static List<Integer> isTriangleNeighbor(Triangle triangle1, Triangle triangle2) {
-			List<Integer> pos = new ArrayList<>();
+		private static HashMap<Vector3D, ArrayList<Vector3D>> isTriangleNeighbor(Triangle triangle1, Triangle triangle2) {
+			HashMap<Vector3D, ArrayList<Vector3D>> pos = new HashMap<Vector3D, ArrayList<Vector3D>>();
 			for (int i = 0; i < 3; i++) {
+				Vector3D p1 = triangle1.points[i];
 	            for (int j = 0; j < 3; j++) {
+					Vector3D p21 = triangle2.points[j];
+					Vector3D p22 = triangle2.points[(j+1)% 3];
 	                double x = 0;
 	                double y = 0, z = 0;
 	                double a = 0, b = 0, c = 0, d = 0, e = 0, f = 0;
 	                
-	                x = triangle1.points[i].x;
-	                y = triangle1.points[i].y;
-	                z = triangle1.points[i].z;
+	                x = p1.x;
+	                y = p1.y;
+	                z = p1.z;
 	                 
 	                
-	                a = triangle2.points[j].x;
-                    b = triangle2.points[j].y;
-                    c = triangle2.points[j].z;
-                    d = triangle2.points[(j+1)% 3].x;
-                    e = triangle2.points[(j+1)% 3].y;
-                    f = triangle2.points[(j+1)% 3].z;
+	                a = p21.x;
+                    b = p21.y;
+                    c = p21.z;
+                    d = p22.x;
+                    e = p22.y;
+                    f = p22.z;
 	               
 	                if (x == a && y == b && z == c) {
-	                    pos.add(j);
+	                	//pos.computeIfAbsent(p1, (v)-> new ArrayList<>()).add(p21);
+	                	pos.computeIfAbsent(p1, (v)-> new ArrayList<>()).add(triangle2.tmpforce[j]);
 	                }
 	                else if ((x - a) * (x - d) + (y - b) * (y - e) + (z - c) * (z - f) == 0d) {
-	                	pos.add(j);
-	                    pos.add((j+1)% 3);
+	                	//pos.computeIfAbsent(p1, (v)-> new ArrayList<>()).add(p21);
+	                	//pos.computeIfAbsent(p1, (v)->new ArrayList<>()).add(p22);
+	                	pos.computeIfAbsent(p1, (v)-> new ArrayList<>()).add(triangle2.tmpforce[j]);
+	                	pos.computeIfAbsent(p1, (v)->new ArrayList<>()).add(triangle2.tmpforce[(j+1)%3]);
 	                }
 	            }
 	        }
@@ -171,11 +195,11 @@ public class BasicPlane extends AbstractPlane{
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
 			
-			for(Triangle t:this.keySet()) {
-				StringJoiner sj = new StringJoiner("\n\t","["+t.toString()+"]-->\n\t","\n");
-				//for(Triangle t2:this.get(t))sj.add(t2.toString());
-				sb.append(sj.toString());
-			}
+//			for(Triangle t:this.keySet()) {
+//				StringJoiner sj = new StringJoiner("\n\t","["+t.toString()+"]-->\n\t","\n");
+//				//for(Triangle t2:this.get(t))sj.add(t2.toString());
+//				sb.append(sj.toString());
+//			}
 			
 			return sb.toString();
 		}                 
@@ -198,7 +222,7 @@ public class BasicPlane extends AbstractPlane{
 	public List<BasicPlaneShape> getShapes() {
 		return shapes;
 	}
-	public TriangleMap getNeighMap() {
+	public PointMap getNeighMap() {
 		return neighMap;
 	}
 	public static void main(String args[]) {

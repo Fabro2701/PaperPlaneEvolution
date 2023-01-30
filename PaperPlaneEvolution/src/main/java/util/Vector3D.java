@@ -15,6 +15,11 @@ public class Vector3D implements Cloneable{
 	public static Vector3D of(double x, double y, double z) {
 		return new Vector3D(x,y,z);
 	}
+	public void reset() {
+		x=0d;
+		y=0d;
+		z=0d;
+	}
 	@Override
 	public Object clone() {
 		return new Vector3D(x,y,z);
