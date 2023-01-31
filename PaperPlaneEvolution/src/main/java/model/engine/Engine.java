@@ -11,15 +11,15 @@ import util.Vector3D;
 
 public class Engine {
 	BasicPlane plane;
-	final double GRAVITY = 0.0001d;
+	final double GRAVITY = 0.01d;
 	
 	public Engine(BasicPlane plane) {
 		this.plane = plane;
 	}
 	public void step(double dt) {
 		List<Triangle> tris = this.plane.getTriangles();
-		Vector3D origin = Vector3D.of(5, 0, 5);
-		Vector3D wind = Vector3D.of(0, 1, 0);
+		Vector3D origin = Vector3D.of(10, 30, 2);
+		Vector3D wind = Vector3D.of(0, -50, 0);
 		
 		//double sumMass = tris.stream().mapToDouble((Triangle t)->{return t.mass;}).sum();
 		PointMap neighbors = plane.getNeighMap();
@@ -34,6 +34,7 @@ public class Engine {
 		for(Triangle tri:tris) {
 			Vector3D phit = intersectionTriangle(tri.points[0],tri.points[1],tri.points[2],origin,wind);
 			if(phit!=null) {
+				System.out.println("u: "+phit);
 				double d[] = new double[3];
 				double sum = 0d;
 				for(int i=0;i<3;i++) {
@@ -43,7 +44,7 @@ public class Engine {
 				}
 				for(int i=0;i<3;i++) {
 					d[i] = 1d - (d[i]/sum);
-					tri.force[i].add(Vector3D.mul(wind, d[i]*0.1d));
+					tri.force[i].add(Vector3D.mul(wind, d[i]*1d));
 				}
 			}
 			
@@ -51,7 +52,7 @@ public class Engine {
 		for(Triangle tri:tris) {
 			//System.out.println(neighbors.size());
 			for(int i=0;i<3;i++) {
-				tri.force[i].y += -GRAVITY*tri.mass;
+				//tri.force[i].y += -GRAVITY*tri.mass;
 			}
 		}
 //		System.out.println("before");
@@ -85,7 +86,9 @@ public class Engine {
 		
 		for(Triangle tri:tris) {
 			for(int i=0; i<3; i++) {
-				tri.points[i].add(Vector3D.add(Vector3D.add(tri.force[i], dt), dt));
+				
+				tri.velocity[i].add(Vector3D.mul(tri.force[i], dt/tri.mass));
+				tri.points[i].add(Vector3D.mul(tri.velocity[i], dt));
 	        }
 		}
 		

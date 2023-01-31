@@ -9,7 +9,7 @@ public class Triangle {
 	public Color col = Color.gray;
 	
 	public double mass;
-	public Vector3D velocity = Vector3D.of(0d, 0d, 0d);
+	public Vector3D velocity[] = new Vector3D[] {Vector3D.of(0d, 0d, 0d),Vector3D.of(0d, 0d, 0d),Vector3D.of(0d, 0d, 0d)};
 	public Vector3D force[] = new Vector3D[] {Vector3D.of(0d, 0d, 0d),Vector3D.of(0d, 0d, 0d),Vector3D.of(0d, 0d, 0d)};
 	public Vector3D tmpforce[] = new Vector3D[] {Vector3D.of(0d, 0d, 0d),Vector3D.of(0d, 0d, 0d),Vector3D.of(0d, 0d, 0d)};
 	

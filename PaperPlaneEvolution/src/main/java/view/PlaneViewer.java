@@ -1,5 +1,6 @@
 package view;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -34,35 +35,23 @@ import util.Vector3D;
 
 
 public class PlaneViewer extends JPanel{
-	Matrix projectionMatrix;
-	int width=1000,height=900;
-	double zfar=1000d,znear=0.1d;
-	double a=(double)width/(double)height,f=90d,q=zfar/(zfar-znear);
-	double frad = (double) (1d/ (double)Math.tan(f*0.5d/180d*3.14159d));
-	double offset = 28d;
-	double time = 0.0d;
-	Vector3D camera;
-	Vector3D lookDir;
-	double fYaw,fXaw;
+	ProjectionUtil renderer;
 	
 	BasicPlane plane;
 	List<Triangle> tris;
 	
 	public PlaneViewer(BasicPlane plane){
 		this.plane = plane;
+		this.renderer = new ProjectionUtil();
 		
-		Dimension size = new Dimension(width, height);
+		Dimension size = new Dimension(renderer.width, renderer.height);
 		this.setMinimumSize(size);
 		this.setMaximumSize(size);
 		this.setPreferredSize(size);
 		
 		this.init();
 		
-		this.projectionMatrix = Matrix.Matrix_MakeProjection(f, a, znear, zfar);
-		
-		camera = new Vector3D(0d,0d,0d);
-		lookDir = new Vector3D(0d,0d,1d);
-		
+
 		MouseAdapter mouseA = new MouseAdapter() {
 			
 			boolean pressed = false;
@@ -86,16 +75,16 @@ public class PlaneViewer extends JPanel{
 					int dy = dir.y-current.y;
 					
 					double decreaseFactor = 10000.0d;
-					if(Math.abs(dx) >10)PlaneViewer.this.fYaw +=(double)dx/decreaseFactor;
-					if(Math.abs(dy) >10)PlaneViewer.this.fXaw +=(double)dy/decreaseFactor;
+					if(Math.abs(dx) >10)renderer.fYaw +=(double)dx/decreaseFactor;
+					if(Math.abs(dy) >10)renderer.fXaw +=(double)dy/decreaseFactor;
 							
 					repaint();
 				}
 			}
 			@Override
 			public void mouseWheelMoved(MouseWheelEvent e) {
-				Vector3D vForward = Vector3D.mul(PlaneViewer.this.lookDir, -((double)e.getWheelRotation())*0.3d);
-				PlaneViewer.this.camera = Vector3D.add(PlaneViewer.this.camera, vForward);
+				Vector3D vForward = Vector3D.mul(renderer.lookDir, -((double)e.getWheelRotation())*0.3d);
+				renderer.camera = Vector3D.add(renderer.camera, vForward);
 				repaint();
 			}
 		};
@@ -111,22 +100,22 @@ public class PlaneViewer extends JPanel{
 				int c = ke.getKeyCode();
 				switch(c) {
 				  case KeyEvent.VK_S:
-					  PlaneViewer.this.camera.y-=0.8d;
+					  renderer.camera.y-=0.8d;
 				    break;
 				  case KeyEvent.VK_W:
-					  PlaneViewer.this.camera.y+=0.8d;
+					  renderer.camera.y+=0.8d;
 				    break;
 				  case KeyEvent.VK_D:
-					  PlaneViewer.this.camera.x-=0.8d;
+					  renderer.camera.x-=0.8d;
 				    break;
 				  case KeyEvent.VK_A:
-					  PlaneViewer.this.camera.x+=0.8d;
+					  renderer.camera.x+=0.8d;
 				    break;
 				  case KeyEvent.VK_R:
-					  PlaneViewer.this.camera.z-=0.8d;
+					  renderer.camera.z-=0.8d;
 				    break;
 				  case KeyEvent.VK_F:
-					  PlaneViewer.this.camera.z+=0.8d;
+					  renderer.camera.z+=0.8d;
 				    break;
 
 				  default:				    
@@ -135,13 +124,10 @@ public class PlaneViewer extends JPanel{
 			}
 
 			@Override
-			public void keyReleased(KeyEvent ke) {
-				
-			}
+			public void keyReleased(KeyEvent ke) {}
 
 			@Override
-			public void keyTyped(KeyEvent ke) {
-			}
+			public void keyTyped(KeyEvent ke) {}
 			
 		};
 		this.addKeyListener(keyListener);
@@ -167,121 +153,53 @@ public class PlaneViewer extends JPanel{
 		//g2.fillOval(651, 368, 10, 10);
 		//g2.drawString("HOLA", this.time, 15f);
 		
-		Matrix zrotation = Matrix.Matrix_MakeRotationZ(time);
-		Matrix xrotation = Matrix.Matrix_MakeRotationX(time);
-		
-		Matrix matTrans = Matrix.translate(0d, 0d, offset);
-		
-		Matrix matWorld = Matrix.identity();
-		matWorld = zrotation.multiply(xrotation);
-		matWorld = matWorld.multiply(matTrans);
-		
-		Vector3D vUp = new Vector3D(0d,1d,0d);
-		//Vector3D vTarget = camera.add(lookDir);
-		Vector3D vTarget = new Vector3D(0d,0d,1d);
-		Matrix matCameraRot = Matrix.Matrix_MakeRotationY(fYaw);
-		matCameraRot = matCameraRot.multiply(Matrix.Matrix_MakeRotationX(fXaw));
-		lookDir = Vector3D.multiplyMatrix(vTarget, matCameraRot);
-		//lookDir = new Vector3D(256.0f, 179.99997f, 0.9875988f);
-		vTarget = Vector3D.add(camera, lookDir);
-		
-		Matrix matCamera = Matrix.Matrix_PointAt(camera, vTarget, vUp);
-		Matrix matView = Matrix.Matrix_QuickInverse(matCamera);
-
-		List<Triangle>trianglesToRaster = new ArrayList<Triangle>();
 		this.tris = this.plane.getTriangles();
-		for(Triangle tri:this.tris) {
-			//System.out.println("printingini: "+tri.toString());
-			Triangle triTransformed = new Triangle(Vector3D.multiplyMatrix(tri.points[0], matWorld),
-												   Vector3D.multiplyMatrix(tri.points[1], matWorld),
-												   Vector3D.multiplyMatrix(tri.points[2], matWorld));
-			
-			triTransformed.col = tri.col;
-			
-			Vector3D l1 = Vector3D.sub(triTransformed.points[1], triTransformed.points[0]);
-			Vector3D l2 = Vector3D.sub(triTransformed.points[2], triTransformed.points[0]);
 
-			Vector3D normal = Vector3D.crossProduct(l1, l2);
-			normal = Vector3D.normal(normal);
-			
-			Vector3D cameraRay = Vector3D.sub(triTransformed.points[0], camera);
-
-			//if(Vector3D.dotProduct(normal, cameraRay) < 0f) {
-			if(true) {
-				Triangle triViewed = new Triangle(Vector3D.multiplyMatrix(triTransformed.points[0], matView),
-						  Vector3D.multiplyMatrix(triTransformed.points[1], matView),
-						  Vector3D.multiplyMatrix(triTransformed.points[2], matView));
-				triViewed.col = triTransformed.col;
-				
-				
-				int nClippedTriangles = 0;
-				Triangle clipped[] = new Triangle[] {new Triangle(),new Triangle()};
-				nClippedTriangles = Triangle.Triangle_ClipAgainstPlane(new Vector3D(0.0d, 0.0d, 0.1d), 
-																	   new Vector3D(0.0d, 0.0d, 1.0d), 
-																	   triViewed, 
-																	   clipped);
-
-				for (int n = 0; n < nClippedTriangles; n++){
-					
-					Triangle triProjected = new Triangle(Vector3D.multiplyMatrix(clipped[n].points[0], projectionMatrix),
-														 Vector3D.multiplyMatrix(clipped[n].points[1], projectionMatrix),
-														 Vector3D.multiplyMatrix(clipped[n].points[2], projectionMatrix));
-					triProjected.col = clipped[n].col;
-					
-					triProjected.points[0] = Vector3D.div(triProjected.points[0], triProjected.points[0].w);
-					triProjected.points[1] = Vector3D.div(triProjected.points[1], triProjected.points[1].w);
-					triProjected.points[2] = Vector3D.div(triProjected.points[2], triProjected.points[2].w);
-					
-					triProjected.points[0].x *= -1.0d;
-					triProjected.points[1].x *= -1.0d;
-					triProjected.points[2].x *= -1.0d;
-					triProjected.points[0].y *= -1.0d;
-					triProjected.points[1].y *= -1.0d;
-					triProjected.points[2].y *= -1.0d;
-					
-					Vector3D offsetView = new Vector3D(1d,1d,0d);
-					triProjected.points[0] = Vector3D.add(triProjected.points[0], offsetView);
-					triProjected.points[1] = Vector3D.add(triProjected.points[1], offsetView);
-					triProjected.points[2] = Vector3D.add(triProjected.points[2], offsetView);
-					
-					triProjected.points[0].x *= 0.5d * (double)this.getWidth();
-					triProjected.points[0].y *= 0.5d * (double)this.getHeight();
-					triProjected.points[1].x *= 0.5d * (double)this.getWidth();
-					triProjected.points[1].y *= 0.5d * (double)this.getHeight();
-					triProjected.points[2].x *= 0.5d * (double)this.getWidth();
-					triProjected.points[2].y *= 0.5d * (double)this.getHeight();
-					
-					
-					
-					trianglesToRaster.add(triProjected);
-					/*System.out.println("printingf: "+tri.toString());
-					g2.setColor(Color.black);
-					g2.fillPolygon(new int[] {(int) triProjected.points[0].x,(int)triProjected.points[1].x,(int)triProjected.points[2].x}, new int[] {(int)triProjected.points[0].y,(int)triProjected.points[1].y,(int)triProjected.points[2].y}, 3);
-					
-					g2.setColor(Color.green);
-					g2.drawPolygon(new int[] {(int) triProjected.points[0].x,(int)triProjected.points[1].x,(int)triProjected.points[2].x}, new int[] {(int)triProjected.points[0].y,(int)triProjected.points[1].y,(int)triProjected.points[2].y}, 3);
-					 */
-				}
-			}
-
-		}
-		Collections.sort(trianglesToRaster, new Comparator<Triangle>(){
-			@Override
-			public int compare(Triangle t1, Triangle t2) {
-				double z1 = (t1.points[0].z + t1.points[1].z + t1.points[2].z) / 3.0d;
-				double z2 = (t2.points[0].z + t2.points[1].z + t2.points[2].z) / 3.0d;
-				return z1<z2?1:z1>z2?-1:0;
-			}
-		});
+		g2.setStroke(new BasicStroke(5));
+		
+		List<Triangle>trianglesToRaster = this.renderer.triangles(this.tris);
+		
 		for(Triangle t:trianglesToRaster) {
 			//g2.setColor(t.col==null ? new Color(0,0,0,100) : t.col);
-			g2.setColor(new Color(0,0,0,100));
+			g2.setColor(new Color(0,255,0,150));
 			g2.fillPolygon(new int[] {(int) t.points[0].x,(int)t.points[1].x,(int)t.points[2].x}, new int[] {(int)t.points[0].y,(int)t.points[1].y,(int)t.points[2].y}, 3);
 			
-			g2.setColor(new Color(0,255,0,100));
+			g2.setColor(new Color(0,0,0,150));
 			g2.drawPolygon(new int[] {(int) t.points[0].x,(int)t.points[1].x,(int)t.points[2].x}, new int[] {(int)t.points[0].y,(int)t.points[1].y,(int)t.points[2].y}, 3);
 			
 		}
+
+		
+		Vector3D origin = Vector3D.of(10, 5, -20);
+		Vector3D wind = Vector3D.of(0, 0, 70);
+		List<Vector3D>phs = new ArrayList<>();
+		for(Triangle t:this.tris) {
+			Vector3D tmp = Engine.intersectionTriangle(t.points[0], t.points[1], t.points[2], origin, wind);
+			if(tmp!=null) {
+				System.out.println("d: "+tmp);
+				phs.add(tmp);
+			}
+		}
+		
+
+		List<Vector3D>vs = new ArrayList<>();
+		vs.add(origin);
+		vs.add(Vector3D.add(wind, origin));
+		vs.addAll(phs);
+		List<Vector3D>vectorsToRaster = this.renderer.vectors(vs);
+		//for(Vector3D v:vectorsToRaster) {
+			g2.setColor(new Color(0,255,255,150));
+			g2.drawLine((int)vectorsToRaster.get(0).x, (int)vectorsToRaster.get(0).y, 
+						(int)vectorsToRaster.get(1).x, (int)vectorsToRaster.get(1).y);
+		//}
+
+		for(int i=2;i<vectorsToRaster.size();i++) {
+			Vector3D v = vectorsToRaster.get(i);
+			g2.setColor(new Color(0,0,0,200));
+			g2.drawOval((int)v.x, (int)v.y, 3, 3);
+		}
+			
+		
 	}
 	public static void main(String args[]) {
 		RandomSingleton.setSeed(11L);
@@ -378,7 +296,7 @@ public class PlaneViewer extends JPanel{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			engine.step(0.001d);
+			engine.step(0.01d);
 			panel.repaint();
 		}
 	}
