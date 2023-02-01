@@ -1,11 +1,10 @@
 package model.engine;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import model.plane.BasicPlane;
 import model.plane.BasicPlane.PointMap;
+import model.plane.BasicPlane.PointMap.TriPoint;
 import util.Triangle;
 import util.Vector3D;
 
@@ -18,8 +17,8 @@ public class Engine {
 	}
 	public void step(double dt) {
 		List<Triangle> tris = this.plane.getTriangles();
-		Vector3D origin = Vector3D.of(10, 30, 2);
-		Vector3D wind = Vector3D.of(0, -50, 0);
+		Vector3D origin = Vector3D.of(2, 5, -5);
+		Vector3D wind = Vector3D.mul(Vector3D.of(0, 0.5, 0.5), 20d);
 		
 		//double sumMass = tris.stream().mapToDouble((Triangle t)->{return t.mass;}).sum();
 		PointMap neighbors = plane.getNeighMap();
@@ -32,9 +31,9 @@ public class Engine {
 		}
 		
 		for(Triangle tri:tris) {
-			Vector3D phit = intersectionTriangle(tri.points[0],tri.points[1],tri.points[2],origin,wind);
+			Vector3D phit = intersectionTriangle(tri.points[0],tri.points[1],tri.points[2],
+												 origin,wind);
 			if(phit!=null) {
-				System.out.println("u: "+phit);
 				double d[] = new double[3];
 				double sum = 0d;
 				for(int i=0;i<3;i++) {
@@ -73,7 +72,7 @@ public class Engine {
 			for(Triangle tri:tris) {
 				for(int i=0;i<3;i++) {
 					if(!neighbors.containsKey(tri.points[i]))continue;
-					spreadToNeighbors(tri.points[i], tri.force[i], neighbors.get(tri.points[i]));
+					spreadToNeighbors(tri, i, neighbors.get(tri.points[i]));
 				}
 			}
 			for(Triangle tri:tris) {
@@ -101,9 +100,12 @@ public class Engine {
 //		}
 	}
 	
-	private void spreadToNeighbors(Vector3D point, Vector3D force, List<Vector3D> list) {
-		for(Vector3D neigh:list) {
-			neigh.add(force);
+	private void spreadToNeighbors(Triangle tri, int idx, List<TriPoint> list) {
+		for(TriPoint neigh:list) {
+			double mm = neigh.tri.mass/(tri.mass+neigh.tri.mass);
+			tri.force[idx].mul(1.0-mm);
+			neigh.tri.tmpforce[neigh.idx].add(tri.force[idx]);
+			
 		}
 				//t.force[idx].add(-GRAVITY*tri.mass*0.05);
 			

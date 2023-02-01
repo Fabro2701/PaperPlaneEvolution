@@ -125,7 +125,6 @@ public class PlaneViewer extends JPanel{
 
 			@Override
 			public void keyReleased(KeyEvent ke) {}
-
 			@Override
 			public void keyTyped(KeyEvent ke) {}
 			
@@ -170,13 +169,13 @@ public class PlaneViewer extends JPanel{
 		}
 
 		
-		Vector3D origin = Vector3D.of(10, 5, -20);
-		Vector3D wind = Vector3D.of(0, 0, 70);
+		Vector3D origin = Vector3D.of(2, 5, -5);
+		Vector3D wind = Vector3D.mul(Vector3D.of(0, 0.5, 0.5), 20d);
+		
 		List<Vector3D>phs = new ArrayList<>();
 		for(Triangle t:this.tris) {
 			Vector3D tmp = Engine.intersectionTriangle(t.points[0], t.points[1], t.points[2], origin, wind);
 			if(tmp!=null) {
-				System.out.println("d: "+tmp);
 				phs.add(tmp);
 			}
 		}
@@ -220,12 +219,12 @@ public class PlaneViewer extends JPanel{
 						"tri(+(N(-1,0,0),endBase),+(N(5,0,-10),minZ),+(N(0,0,0),minZ));"+
 						"tri(+(N(-1,0,0),endBase),+(N(5,0,10),maxZ),+(N(0,0,0),maxZ));";
 		*/
-		String test = "plane(40,0,20,10);tri(upperRightCorner,+(upperRightCorner,N(5,-2,7)),endBase);tri(upperRightCorner,+(upperRightCorner,N(0,0,5)),+(upperRightCorner,N(5,-2,7)));"+
+		/*String test = "plane(40,0,20,10);tri(upperRightCorner,+(upperRightCorner,N(5,-2,7)),endBase);tri(upperRightCorner,+(upperRightCorner,N(0,0,5)),+(upperRightCorner,N(5,-2,7)));"+
 				"tri(upperLeftCorner,+(upperLeftCorner,N(5,-2,-7)),endBase);tri(upperLeftCorner,+(upperLeftCorner,N(0,0,-5)),+(upperLeftCorner,N(5,-2,-7)));"+
 				"tri(endBase,+(N(5,0,-10),minZ),+(N(0,0,0),minZ));"+
 				"tri(endBase,+(N(5,0,10),maxZ),+(N(0,0,0),maxZ));";
-
-		//String test = "plane(40,0,20,10);";
+		 */
+		String test = "plane(40,0,20,10);";
 		int op = 0;
 		BasicPlane plane = null;
 		
@@ -243,36 +242,7 @@ public class PlaneViewer extends JPanel{
 		
 		System.out.println(plane);
 		
-		/*plane.addShape(new BasicPlaneShape(plane.upperRightCorner,
-				   plane.endBase,
-				   plane.upperLeftCorner)
-				   );*/
-		/*plane.addShape(new BasicPlaneShape(plane.upperRightCorner,
-										   plane.endBase,
-										   Vector3D.add(plane.upperRightCorner, Vector3D.of(0f, 0f, 5f))
-										   ));
-		plane.addShape(new BasicPlaneShape(plane.upperLeftCorner,
-				   						   plane.endBase,
-				   						   Vector3D.add(plane.upperLeftCorner, Vector3D.of(0f, 0f, -5f))
-				   ));*/
-				   
-		/*plane.addShape(new BasicPlaneShape(plane.upperRightCorner,
-										   Vector3D.add(plane.upperRightCorner, Vector3D.of(0f, 2f, 5f)),
-										   plane.endBase
-				   ));
-		plane.addShape(new BasicPlaneShape(plane.upperRightCorner,
-				   Vector3D.add(plane.upperRightCorner, Vector3D.of(0f, -2f, 5f)),
-				   plane.endBase
-				));
-		
-		plane.addShape(new BasicPlaneShape(plane.upperLeftCorner,
-				   Vector3D.add(plane.upperLeftCorner, Vector3D.of(0f, 2f, -5f)),
-				   plane.endBase
-				));
-		plane.addShape(new BasicPlaneShape(plane.upperLeftCorner,
-				Vector3D.add(plane.upperLeftCorner, Vector3D.of(0f, -2f, -5f)),
-				plane.endBase
-				));*/
+
 		
 		PlaneViewer panel = new PlaneViewer(plane);
 		SwingUtilities.invokeLater(()->{
@@ -296,7 +266,7 @@ public class PlaneViewer extends JPanel{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			engine.step(0.01d);
+			engine.step(0.05d);
 			panel.repaint();
 		}
 	}

@@ -1,16 +1,13 @@
 package model.plane;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.StringJoiner;
 import java.util.function.Function;
 
+import model.plane.BasicPlane.PointMap.TriPoint;
 import model.plane.shapes.BasicPlaneShape;
 import util.Triangle;
 import util.Vector3D;
@@ -115,13 +112,23 @@ public class BasicPlane extends AbstractPlane{
 		neighMap = PointMap.init(this.tris);
 		System.out.println(neighMap);
 	}
-	public static class PointMap extends HashMap<Vector3D, List<Vector3D>>{
+	public static class PointMap extends HashMap<Vector3D, List<TriPoint>>{
+		public static class TriPoint{
+			public Triangle tri;
+			public int idx;
+			public static TriPoint of(Triangle tri, int idx) {
+				TriPoint p = new TriPoint();
+				p.tri=tri;
+				p.idx=idx;
+				return p;
+			}
+		}
 		public static PointMap init(List<Triangle>tris) {
 			
 			PointMap map = new PointMap();
 			for(Triangle t1:tris) {
 				for(Triangle t2:tris) {
-					HashMap<Vector3D, ArrayList<Vector3D>> pos = null;
+					HashMap<Vector3D, ArrayList<TriPoint>> pos = null;
 					if(t1!=t2 && !((pos=isTriangleNeighbor(t1, t2)).isEmpty())) {
 						for(Vector3D k:pos.keySet()) {
 							map.computeIfAbsent(k, (v)->new ArrayList<>()).addAll(pos.get(k));
@@ -154,8 +161,8 @@ public class BasicPlane extends AbstractPlane{
 			
 			return map;
 		}
-		private static HashMap<Vector3D, ArrayList<Vector3D>> isTriangleNeighbor(Triangle triangle1, Triangle triangle2) {
-			HashMap<Vector3D, ArrayList<Vector3D>> pos = new HashMap<Vector3D, ArrayList<Vector3D>>();
+		private static HashMap<Vector3D, ArrayList<TriPoint>> isTriangleNeighbor(Triangle triangle1, Triangle triangle2) {
+			HashMap<Vector3D, ArrayList<TriPoint>> pos = new HashMap<Vector3D, ArrayList<TriPoint>>();
 			for (int i = 0; i < 3; i++) {
 				Vector3D p1 = triangle1.points[i];
 	            for (int j = 0; j < 3; j++) {
@@ -179,13 +186,13 @@ public class BasicPlane extends AbstractPlane{
 	               
 	                if (x == a && y == b && z == c) {
 	                	//pos.computeIfAbsent(p1, (v)-> new ArrayList<>()).add(p21);
-	                	pos.computeIfAbsent(p1, (v)-> new ArrayList<>()).add(triangle2.tmpforce[j]);
+	                	pos.computeIfAbsent(p1, (v)-> new ArrayList<>()).add(TriPoint.of(triangle2, j));
 	                }
 	                else if ((x - a) * (x - d) + (y - b) * (y - e) + (z - c) * (z - f) == 0d) {
 	                	//pos.computeIfAbsent(p1, (v)-> new ArrayList<>()).add(p21);
 	                	//pos.computeIfAbsent(p1, (v)->new ArrayList<>()).add(p22);
-	                	pos.computeIfAbsent(p1, (v)-> new ArrayList<>()).add(triangle2.tmpforce[j]);
-	                	pos.computeIfAbsent(p1, (v)->new ArrayList<>()).add(triangle2.tmpforce[(j+1)%3]);
+	                	pos.computeIfAbsent(p1, (v)-> new ArrayList<>()).add(TriPoint.of(triangle2, j));
+	                	pos.computeIfAbsent(p1, (v)->new ArrayList<>()).add(TriPoint.of(triangle2, (j+1)%3));
 	                }
 	            }
 	        }
