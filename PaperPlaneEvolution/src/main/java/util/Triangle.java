@@ -1,6 +1,9 @@
 package util;
 
 import java.awt.Color;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 
 
@@ -144,5 +147,13 @@ public class Triangle {
 	@Override
 	public String toString() {
 		return points[0]+" , "+points[1]+" , "+points[2];
+	}
+	public List<Triangle> breakTri() {
+		List<Triangle> newTris = new ArrayList<Triangle>();
+		
+		newTris.add(Triangle.of(this.points[1], Vector3D.add(this.points[1], this.points[2]).mul(0.5d), this.points[0]));
+		newTris.add(Triangle.of(Vector3D.add(this.points[1], this.points[2]).mul(0.5d), this.points[2], this.points[0]));
+		
+		return newTris;
 	}
 }

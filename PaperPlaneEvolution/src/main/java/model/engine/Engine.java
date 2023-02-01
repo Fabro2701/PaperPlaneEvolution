@@ -17,43 +17,19 @@ public class Engine {
 	}
 	public void step(double dt) {
 		List<Triangle> tris = this.plane.getTriangles();
-		Vector3D origin = Vector3D.of(2, 5, -5);
-		Vector3D wind = Vector3D.mul(Vector3D.of(0, 0.5, 0.5), 20d);
 		
 		//double sumMass = tris.stream().mapToDouble((Triangle t)->{return t.mass;}).sum();
 		PointMap neighbors = plane.getNeighMap();
 		//System.out.println(sumMass);
-		for(Triangle tri:tris) {
-			for(int i=0;i<3;i++) {
-				tri.force[i].reset();
-				tri.tmpforce[i].reset();
-			}
-		}
 		
-		for(Triangle tri:tris) {
-			Vector3D phit = intersectionTriangle(tri.points[0],tri.points[1],tri.points[2],
-												 origin,wind);
-			if(phit!=null) {
-				double d[] = new double[3];
-				double sum = 0d;
-				for(int i=0;i<3;i++) {
-					d[i] = Math.abs(Vector3D.length(Vector3D.sub(phit, tri.points[i])));
-					sum += d[i];
-					
-				}
-				for(int i=0;i<3;i++) {
-					d[i] = 1d - (d[i]/sum);
-					//tri.force[i].add(Vector3D.mul(wind, d[i]*1d));
-				}
-			}
-			
-		}
-		for(Triangle tri:tris) {
-			//System.out.println(neighbors.size());
-			for(int i=0;i<3;i++) {
-				tri.force[i].y += -GRAVITY*tri.mass;
-			}
-		}
+		this.resetForces(tris);
+
+		Vector3D origin = Vector3D.of(2, 5, -5);
+		Vector3D wind = Vector3D.mul(Vector3D.of(0, 0.5, 0.5), 20d);
+		this.windRays(origin, wind, tris);
+		
+		//this.gravityForce(tris);
+		
 //		System.out.println("before");
 //		for(Triangle tri:tris) {
 //			for(int i=0;i<3;i++) {
@@ -64,7 +40,12 @@ public class Engine {
 		for(int d=0;d<2;d++) {
 			for(Triangle tri:tris) {
 				for(int i=0; i<3; i++) {
-					tri.tmpforce[i].div(Math.pow(3, d));
+					tri.tmpforce[i].div(Math.pow(5, d));
+				}
+			}
+			for(Triangle tri:tris) {
+				for(int i=0; i<3; i++) {
+					//tri.tmpforce[i].add(Vector3D.mul(Vector3D.add(tri.tmpforce[(i+1)%3],tri.tmpforce[(i+2)%3]), 0.1d));
 				}
 			}
 			for(Triangle tri:tris) {
@@ -83,8 +64,11 @@ public class Engine {
 		
 		for(Triangle tri:tris) {
 			for(int i=0; i<3; i++) {
+				System.out.println(tri.points[i].z);
 				
+				//tri.velocity[i].add(Vector3D.mul(tri.force[i], dt));
 				tri.velocity[i].add(Vector3D.mul(tri.force[i], dt/tri.mass));
+
 				tri.points[i].add(Vector3D.mul(tri.velocity[i], dt));
 	        }
 		}
@@ -98,6 +82,32 @@ public class Engine {
 //		}
 	}
 	
+	private void gravityForce(List<Triangle> tris) {
+		for(Triangle tri:tris) {
+			for(int i=0;i<3;i++) {
+				tri.force[i].y += -GRAVITY*tri.mass;
+				//tri.force[i].sub(Vector3D.mul(Vector3D.mul(tri.velocity[i], tri.velocity[i]), 1d*tri.mass));
+			}
+		}
+	}
+	private void windRays(Vector3D origin, Vector3D wind, List<Triangle> tris) {
+		for(Triangle tri:tris) {
+			Vector3D phit = intersectionTriangle(tri.points[0],tri.points[1],tri.points[2],
+												 origin,wind);
+			if(phit!=null) {
+				double d[] = new double[3];
+				double sum = 0d;
+				for(int i=0;i<3;i++) {
+					d[i] = Math.abs(Vector3D.length(Vector3D.sub(phit, tri.points[i])));
+					sum += d[i];
+				}
+				for(int i=0;i<3;i++) {
+					d[i] = 1d - (d[i]/sum);
+					tri.force[i].add(Vector3D.mul(wind, d[i]*1d));
+				}
+			}
+		}
+	}
 	private void spreadToNeighbors(Triangle tri, int idx, List<TriPoint> list) {
 		double d = 1.0;//initial deacrease factor
 		for(TriPoint neigh:list) {
@@ -108,9 +118,20 @@ public class Engine {
 		
 		for(TriPoint neigh:list) {
 			neigh.tri.tmpforce[neigh.idx].add(tri.force[idx]);
-		}			
+		}
+//		for(int i=0;i<3;i++) {
+//			if(i==idx)continue;
+//			tri.tmpforce[i].add(tri.force[idx]);
+//		}
 	}
-
+	public void resetForces(List<Triangle> tris) {
+		for(Triangle tri:tris) {
+			for(int i=0;i<3;i++) {
+				tri.force[i].reset();
+				tri.tmpforce[i].reset();
+			}
+		}
+	}
 	public static Vector3D intersectionTriangle(Vector3D p0, Vector3D p1, Vector3D p2, Vector3D origin, Vector3D vector) {
 
 	    Vector3D v0 = Vector3D.sub(p1, p0);

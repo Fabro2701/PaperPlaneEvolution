@@ -154,7 +154,7 @@ public class PlaneViewer extends JPanel{
 		
 		this.tris = this.plane.getTriangles();
 
-		g2.setStroke(new BasicStroke(5));
+		g2.setStroke(new BasicStroke(3));
 		
 		List<Triangle>trianglesToRaster = this.renderer.triangles(this.tris);
 		
@@ -168,6 +168,8 @@ public class PlaneViewer extends JPanel{
 			
 		}
 
+
+		g2.setStroke(new BasicStroke(5));
 		
 		Vector3D origin = Vector3D.of(2, 5, -5);
 		Vector3D wind = Vector3D.mul(Vector3D.of(0, 0.5, 0.5), 20d);
@@ -219,17 +221,20 @@ public class PlaneViewer extends JPanel{
 						"tri(+(N(-1,0,0),endBase),+(N(5,0,-10),minZ),+(N(0,0,0),minZ));"+
 						"tri(+(N(-1,0,0),endBase),+(N(5,0,10),maxZ),+(N(0,0,0),maxZ));";
 		*/
-		String test = "plane(40,0,20,10);tri(upperRightCorner,+(upperRightCorner,N(5,-2,7)),endBase);tri(upperRightCorner,+(upperRightCorner,N(0,0,5)),+(upperRightCorner,N(5,-2,7)));"+
-				"tri(upperLeftCorner,+(upperLeftCorner,N(5,-2,-7)),endBase);tri(upperLeftCorner,+(upperLeftCorner,N(0,0,-5)),+(upperLeftCorner,N(5,-2,-7)));"+
-				"tri(endBase,+(N(5,0,-10),minZ),+(N(0,0,0),minZ));"+
-				"tri(endBase,+(N(5,0,10),maxZ),+(N(0,0,0),maxZ));";
-		 
-		//String test = "plane(40,0,20,10);";
-		int op = 0;
+		/*String test = "plane(40,0,20,10,3);"+ 
+				"tri(upperRightCorner,+(upperRightCorner,N(5,-2,7)),endRightCorner);tri(upperRightCorner,+(upperRightCorner,N(0,0,5)),+(upperRightCorner,N(5,-2,7)));"+
+				"tri(upperLeftCorner,+(upperLeftCorner,N(5,-2,-7)),endLeftCorner);tri(upperLeftCorner,+(upperLeftCorner,N(0,0,-5)),+(upperLeftCorner,N(5,-2,-7)));"+
+				"tri(endLeftCorner,+(N(5,0,-10),minZ),+(N(0,0,0),minZ));"+
+				"tri(endRightCorner,+(N(5,0,10),maxZ),+(N(0,0,0),maxZ));"
+				;
+		 */
+		String test = "plane(40,0,20,10,3);";
 		BasicPlane plane = null;
-		
+
+		int op = 0;
 		if(op==0) {
 			plane = BasicPlaneShape.parsePlaneAndShapes(test);
+			plane.breakTriangles(3);
 			plane.consolidate();
 			plane.getTriangles().stream().forEach(s -> System.out.println(s));
 			
@@ -266,7 +271,7 @@ public class PlaneViewer extends JPanel{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			engine.step(0.5d);
+			engine.step(0.05d);
 			panel.repaint();
 		}
 	}

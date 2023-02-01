@@ -50,6 +50,8 @@ public class ShapeParser {
 		arr.put(this._eat("NUMBER"));
 		this._eat(",");
 		arr.put(this._eat("NUMBER"));
+		this._eat(",");
+		arr.put(this._eat("NUMBER"));
 		this._eat(")");
 		this._eat(";");
 		return arr;

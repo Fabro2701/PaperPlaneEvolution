@@ -31,7 +31,8 @@ public class BasicPlaneShape extends PlaneShape{
 		BasicPlane plane = BasicPlane.construct(planeD.getJSONObject(0).getDouble("value"),
 												planeD.getJSONObject(1).getDouble("value"),
 												planeD.getJSONObject(2).getDouble("value"),
-												planeD.getJSONObject(3).getDouble("value"));
+												planeD.getJSONObject(3).getDouble("value"),
+												planeD.getJSONObject(4).getDouble("value"));
 		
 		JSONArray shapes = r.getJSONArray("shapes");
 		for(int i=0;i<shapes.length();i++) {

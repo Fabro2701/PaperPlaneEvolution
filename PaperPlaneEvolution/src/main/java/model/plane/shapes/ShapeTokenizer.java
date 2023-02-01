@@ -16,7 +16,7 @@ public class ShapeTokenizer{
    		  {"^plane","PLANE"},
    		  {"^tri","TRI"},
    		  {"^cuad","CUAD"},
-   		  {"^startBase|middleBase|endBase|upperRightCorner|upperMiddleRight|upperLeftCorner|upperMiddleLeft","BASE_POINT"},
+   		  {"^startBase|middleBase|endBase|upperRightCorner|upperMiddleRight|upperLeftCorner|upperMiddleLeft|endRightCorner|endLeftCorner","BASE_POINT"},
    		  {"^maxX|maxY|maxZ|minX|minY|minZ","GENERAL_POINT"},
    		  {"^N[(]","NATURAL_POINT"},
    		  {"^[(]","("},

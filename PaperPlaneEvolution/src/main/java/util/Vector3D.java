@@ -70,25 +70,35 @@ public class Vector3D implements Cloneable{
 	public static Vector3D add(Vector3D l, double r) {
 		return new Vector3D(l.x+r,l.y+r,l.z+r);
 	}
-	public void add(Vector3D l) {
-		this.x+=l.x;
-		this.y+=l.y;
-		this.z+=l.z;
-	}
-	public void add(double l) {
+	public Vector3D add(double l) {
 		this.x+=l;
 		this.y+=l;
 		this.z+=l;
+		return this;
 	}
-	public void div(double l) {
+	public Vector3D div(double l) {
 		this.x/=l;
 		this.y/=l;
 		this.z/=l;
+		return this;
 	}
-	public void mul(double l) {
+	public Vector3D mul(double l) {
 		this.x*=l;
 		this.y*=l;
 		this.z*=l;
+		return this;
+	}
+	public Vector3D sub(Vector3D l) {
+		this.x-=l.x;
+		this.y-=l.y;
+		this.z-=l.z;
+		return this;
+	}
+	public Vector3D add(Vector3D l) {
+		this.x+=l.x;
+		this.y+=l.y;
+		this.z+=l.z;
+		return this;
 	}
 	public static Vector3D multiplyMatrix(Vector3D l, Matrix m) {
 		Vector3D v = new Vector3D(0f,0f,0f);

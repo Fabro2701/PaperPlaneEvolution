@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.function.Function;
 
 import model.plane.BasicPlane.PointMap.TriPoint;
@@ -16,6 +17,8 @@ public class BasicPlane extends AbstractPlane{
 	public Vector3D startBase, middleBase, endBase;
 	public Vector3D upperRightCorner, upperMiddleRight;
 	public Vector3D upperLeftCorner, upperMiddleLeft;
+
+	public Vector3D endRightCorner, endLeftCorner;
 	
 	
 	List<Triangle>tris;
@@ -27,7 +30,7 @@ public class BasicPlane extends AbstractPlane{
 		this.tris = new ArrayList<>();
 		this.shapes = new ArrayList<>();
 	}
-	public static BasicPlane construct(double baseLength, double backUpperCornerShift, double bodyAngle, double bodyHeight) {
+	public static BasicPlane construct(double baseLength, double backUpperCornerShift, double bodyAngle, double bodyHeight, double endHeight) {
 		BasicPlane plane = new BasicPlane();
 		
 		plane.startBase = Vector3D.of(0d, 0d, 0d);
@@ -38,6 +41,7 @@ public class BasicPlane extends AbstractPlane{
 		double cosAngle = Math.cos(radAngle);
 		double sinAngle = Math.sin(radAngle);
 		double opp = sinAngle*bodyHeight/cosAngle;
+		double oppEnd = sinAngle*endHeight/cosAngle;
 		
 		plane.upperRightCorner = Vector3D.of(plane.startBase.x - backUpperCornerShift, 
 											 plane.startBase.y + bodyHeight, 
@@ -49,16 +53,32 @@ public class BasicPlane extends AbstractPlane{
 											plane.startBase.z - opp);
 		plane.upperMiddleLeft = Vector3D.mul(Vector3D.add(plane.endBase, plane.upperLeftCorner), 0.5d);
 		
-		
+		plane.endRightCorner = Vector3D.of(plane.endBase.x, 
+										   plane.endBase.y + endHeight, 
+										   plane.endBase.z + oppEnd);
+		plane.endLeftCorner = Vector3D.of(plane.endBase.x, 
+				   						  plane.endBase.y + endHeight, 
+				   						  plane.endBase.z - oppEnd);
 		
 		BasicPlaneShape base1 = new BasicPlaneShape((Vector3D) plane.startBase.clone(), (Vector3D)plane.upperRightCorner.clone(), (Vector3D)plane.endBase.clone());
 		BasicPlaneShape base2 = new BasicPlaneShape((Vector3D) plane.startBase.clone(), (Vector3D)plane.upperLeftCorner.clone(), (Vector3D)plane.endBase.clone());
+
+		BasicPlaneShape base5 = new BasicPlaneShape((Vector3D) plane.startBase.clone(), (Vector3D)plane.upperRightCorner.clone(), (Vector3D)plane.endBase.clone());
+		BasicPlaneShape base6 = new BasicPlaneShape((Vector3D) plane.startBase.clone(), (Vector3D)plane.upperLeftCorner.clone(), (Vector3D)plane.endBase.clone());
+		
+		BasicPlaneShape base3 = new BasicPlaneShape((Vector3D) plane.endRightCorner.clone(), (Vector3D)plane.upperRightCorner.clone(), (Vector3D)plane.endBase.clone());
+		BasicPlaneShape base4 = new BasicPlaneShape((Vector3D) plane.upperLeftCorner.clone(), (Vector3D) plane.endLeftCorner.clone(), (Vector3D)plane.endBase.clone());
 		/*plane.shapes.add(base1);
 		plane.shapes.add(base2);
 		plane.tris.addAll(base1.getTriangles());
 		plane.tris.addAll(base2.getTriangles());*/
 		plane.addShape(base1);
 		plane.addShape(base2);
+		//plane.addShape(base3);
+		//plane.addShape(base4);
+
+		//plane.addShape(base5);
+		//plane.addShape(base6);
 		return plane;
 	}
 	
@@ -111,6 +131,15 @@ public class BasicPlane extends AbstractPlane{
 	public void consolidate() {
 		neighMap = PointMap.init(this.tris);
 		System.out.println(neighMap);
+	}
+	public void breakTriangles(int n) {
+		for(int i=0;i<n;i++) {
+			List<Triangle> newTris = new ArrayList<Triangle>();
+			for(Triangle tri:tris) {
+				newTris.addAll(tri.breakTri());
+			}
+			this.tris = newTris;
+		}
 	}
 	public static class PointMap extends HashMap<Vector3D, List<TriPoint>>{
 		public static class TriPoint{
@@ -191,8 +220,8 @@ public class BasicPlane extends AbstractPlane{
 	                else if ((x - a) * (x - d) + (y - b) * (y - e) + (z - c) * (z - f) == 0d) {
 	                	//pos.computeIfAbsent(p1, (v)-> new ArrayList<>()).add(p21);
 	                	//pos.computeIfAbsent(p1, (v)->new ArrayList<>()).add(p22);
-	                	pos.computeIfAbsent(p1, (v)-> new ArrayList<>()).add(TriPoint.of(triangle2, j));
-	                	pos.computeIfAbsent(p1, (v)->new ArrayList<>()).add(TriPoint.of(triangle2, (j+1)%3));
+	                	//pos.computeIfAbsent(p1, (v)-> new ArrayList<>()).add(TriPoint.of(triangle2, j));
+	                	//pos.computeIfAbsent(p1, (v)->new ArrayList<>()).add(TriPoint.of(triangle2, (j+1)%3));
 	                }
 	            }
 	        }
@@ -202,11 +231,11 @@ public class BasicPlane extends AbstractPlane{
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
 			
-//			for(Triangle t:this.keySet()) {
-//				StringJoiner sj = new StringJoiner("\n\t","["+t.toString()+"]-->\n\t","\n");
-//				//for(Triangle t2:this.get(t))sj.add(t2.toString());
-//				sb.append(sj.toString());
-//			}
+			for(Vector3D t:this.keySet()) {
+				StringJoiner sj = new StringJoiner("\n\t","["+t.toString()+"]-->\n\t","\n");
+				for(TriPoint t2:this.get(t))sj.add(t2.tri.points[t2.idx].toString()+"  from:  "+t2.tri.toString());
+				sb.append(sj.toString());
+			}
 			
 			return sb.toString();
 		}                 
@@ -233,7 +262,7 @@ public class BasicPlane extends AbstractPlane{
 		return neighMap;
 	}
 	public static void main(String args[]) {
-		BasicPlane plane = BasicPlane.construct(50d, 10d, 10d, 15d);
+		BasicPlane plane = BasicPlane.construct(50d, 10d, 10d, 15d, 5d);
 		System.out.println(plane);
 		System.out.println(plane.minX());
 	}
