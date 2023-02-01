@@ -160,7 +160,7 @@ public class PlaneViewer extends JPanel{
 		
 		for(Triangle t:trianglesToRaster) {
 			//g2.setColor(t.col==null ? new Color(0,0,0,100) : t.col);
-			g2.setColor(new Color(0,255,0,150));
+			g2.setColor(new Color(0,255,0,255));
 			g2.fillPolygon(new int[] {(int) t.points[0].x,(int)t.points[1].x,(int)t.points[2].x}, new int[] {(int)t.points[0].y,(int)t.points[1].y,(int)t.points[2].y}, 3);
 			
 			g2.setColor(new Color(0,0,0,150));
@@ -203,7 +203,7 @@ public class PlaneViewer extends JPanel{
 		
 	}
 	public static void main(String args[]) {
-		RandomSingleton.setSeed(11L);
+		RandomSingleton.setSeed(1L);
 		Chromosome<Chromosome.Codon> c = new Chromosome<>(500, Chromosome.Codon::new);
 		StandardGrammar grammar = new StandardGrammar();
 		grammar.parseBNF("resources/grammar/default.bnf");
@@ -234,7 +234,7 @@ public class PlaneViewer extends JPanel{
 		int op = 0;
 		if(op==0) {
 			plane = BasicPlaneShape.parsePlaneAndShapes(test);
-			plane.breakTriangles(3);
+			plane.breakTriangles(0);
 			plane.consolidate();
 			plane.getTriangles().stream().forEach(s -> System.out.println(s));
 			
@@ -271,7 +271,7 @@ public class PlaneViewer extends JPanel{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			engine.step(0.05d);
+			engine.step(0.1d);
 			panel.repaint();
 		}
 	}

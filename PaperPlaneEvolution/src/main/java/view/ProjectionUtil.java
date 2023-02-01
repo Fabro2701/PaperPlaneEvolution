@@ -12,7 +12,7 @@ import util.Vector3D;
 public class ProjectionUtil {
 	Matrix projectionMatrix;
 	int width=1000,height=900;
-	double zfar=1000d,znear=0.1d;
+	double zfar=10000d,znear=0.1d;
 	double a=(double)width/(double)height,f=90d,q=zfar/(zfar-znear);
 	double frad = (double) (1d/ (double)Math.tan(f*0.5d/180d*3.14159d));
 	double offset = 28d;

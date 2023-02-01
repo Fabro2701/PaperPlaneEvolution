@@ -74,8 +74,8 @@ public class BasicPlane extends AbstractPlane{
 		plane.tris.addAll(base2.getTriangles());*/
 		plane.addShape(base1);
 		plane.addShape(base2);
-		//plane.addShape(base3);
-		//plane.addShape(base4);
+		plane.addShape(base3);
+		plane.addShape(base4);
 
 		//plane.addShape(base5);
 		//plane.addShape(base6);

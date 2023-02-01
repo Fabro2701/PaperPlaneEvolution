@@ -12,7 +12,9 @@ public class Triangle {
 	public Color col = Color.gray;
 	
 	public double mass;
-	public Vector3D velocity[] = new Vector3D[] {Vector3D.of(0d, 0d, 0d),Vector3D.of(0d, 0d, 0d),Vector3D.of(0d, 0d, 0d)};
+	public Vector3D velocity[] = new Vector3D[] {Vector3D.of(0d, 1d, 0d),
+												 Vector3D.of(0d, 1d, 0d),
+												 Vector3D.of(0d, 1d, 0d)};
 	public Vector3D force[] = new Vector3D[] {Vector3D.of(0d, 0d, 0d),Vector3D.of(0d, 0d, 0d),Vector3D.of(0d, 0d, 0d)};
 	public Vector3D tmpforce[] = new Vector3D[] {Vector3D.of(0d, 0d, 0d),Vector3D.of(0d, 0d, 0d),Vector3D.of(0d, 0d, 0d)};
 	
@@ -149,10 +151,19 @@ public class Triangle {
 		return points[0]+" , "+points[1]+" , "+points[2];
 	}
 	public List<Triangle> breakTri() {
+		int s1 = RandomSingleton.nextInt(3);
+		int s2 = RandomSingleton.nextInt(3);
+		
+		Vector3D ps1[] = new Vector3D[] {this.points[1], Vector3D.add(this.points[1], this.points[2]).mul(0.5d), this.points[0]};
+		Vector3D ps2[] = new Vector3D[] {Vector3D.add(this.points[1], this.points[2]).mul(0.5d), this.points[2], this.points[0]};
 		List<Triangle> newTris = new ArrayList<Triangle>();
 		
-		newTris.add(Triangle.of(this.points[1], Vector3D.add(this.points[1], this.points[2]).mul(0.5d), this.points[0]));
-		newTris.add(Triangle.of(Vector3D.add(this.points[1], this.points[2]).mul(0.5d), this.points[2], this.points[0]));
+		
+		newTris.add(Triangle.of(ps1[(s1+0)%3],ps1[(s1+1)%3],ps1[(s1+2)%3]));
+		newTris.add(Triangle.of(ps2[(s2+0)%3],ps2[(s2+1)%3],ps2[(s2+2)%3]));
+		
+		//newTris.add(Triangle.of(this.points[1], Vector3D.add(this.points[1], this.points[2]).mul(0.5d), this.points[0]));
+		//newTris.add(Triangle.of(Vector3D.add(this.points[1], this.points[2]).mul(0.5d), this.points[2], this.points[0]));
 		
 		return newTris;
 	}
