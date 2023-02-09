@@ -154,21 +154,22 @@ public class PlaneViewer extends JPanel{
 		
 		this.tris = this.plane.getTriangles();
 
-		g2.setStroke(new BasicStroke(3));
+		g2.setStroke(new BasicStroke(5));
 		
 		List<Triangle>trianglesToRaster = this.renderer.triangles(this.tris);
 		
 		for(Triangle t:trianglesToRaster) {
 			//g2.setColor(t.col==null ? new Color(0,0,0,100) : t.col);
-			g2.setColor(new Color(0,255,0,255));
+
+			g2.setColor(new Color(0,0,0,150));
 			g2.fillPolygon(new int[] {(int) t.points[0].x,(int)t.points[1].x,(int)t.points[2].x}, new int[] {(int)t.points[0].y,(int)t.points[1].y,(int)t.points[2].y}, 3);
 			
-			g2.setColor(new Color(0,0,0,150));
+			g2.setColor(new Color(0,255,0,150));
 			g2.drawPolygon(new int[] {(int) t.points[0].x,(int)t.points[1].x,(int)t.points[2].x}, new int[] {(int)t.points[0].y,(int)t.points[1].y,(int)t.points[2].y}, 3);
 			
 		}
 
-
+/*
 		g2.setStroke(new BasicStroke(5));
 		
 		Vector3D origin = Vector3D.of(2, 5, -5);
@@ -199,7 +200,7 @@ public class PlaneViewer extends JPanel{
 			g2.setColor(new Color(0,0,0,200));
 			g2.drawOval((int)v.x, (int)v.y, 3, 3);
 		}
-			
+*/
 		
 	}
 	public static void main(String args[]) {
@@ -221,14 +222,14 @@ public class PlaneViewer extends JPanel{
 						"tri(+(N(-1,0,0),endBase),+(N(5,0,-10),minZ),+(N(0,0,0),minZ));"+
 						"tri(+(N(-1,0,0),endBase),+(N(5,0,10),maxZ),+(N(0,0,0),maxZ));";
 		*/
-		/*String test = "plane(40,0,20,10,3);"+ 
+		String test = "plane(40,0,20,10,3);"+ 
 				"tri(upperRightCorner,+(upperRightCorner,N(5,-2,7)),endRightCorner);tri(upperRightCorner,+(upperRightCorner,N(0,0,5)),+(upperRightCorner,N(5,-2,7)));"+
 				"tri(upperLeftCorner,+(upperLeftCorner,N(5,-2,-7)),endLeftCorner);tri(upperLeftCorner,+(upperLeftCorner,N(0,0,-5)),+(upperLeftCorner,N(5,-2,-7)));"+
 				"tri(endLeftCorner,+(N(5,0,-10),minZ),+(N(0,0,0),minZ));"+
 				"tri(endRightCorner,+(N(5,0,10),maxZ),+(N(0,0,0),maxZ));"
 				;
-		 */
-		String test = "plane(40,0,20,10,3);";
+		 
+		//String test = "plane(40,0,20,10,3);";
 		BasicPlane plane = null;
 
 		int op = 0;
@@ -271,7 +272,7 @@ public class PlaneViewer extends JPanel{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			engine.step(0.1d);
+			//engine.step(0.1d);
 			panel.repaint();
 		}
 	}
